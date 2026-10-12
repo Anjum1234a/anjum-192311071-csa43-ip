@@ -1,0 +1,659 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Room Booking System</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+    color: #333;
+}
+
+header {
+    background: #17365d;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+header p {
+    margin-top: 8px;
+}
+
+nav {
+    background: #24558b;
+    padding: 15px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 10px;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: #ffd166;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 25px auto;
+}
+
+section {
+    background: white;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+h2 {
+    color: #17365d;
+    margin-bottom: 18px;
+}
+
+h3 {
+    margin-bottom: 12px;
+    color: #24558b;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 11px;
+    margin: 8px 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background: #24558b;
+    color: white;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 3px;
+}
+
+button:hover {
+    background: #17365d;
+}
+
+.hero {
+    background: #dceafa;
+    text-align: center;
+    padding: 35px 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.hero h2 {
+    font-size: 30px;
+}
+
+.rooms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.room-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 20px;
+    background: #fff;
+}
+
+.room-image {
+    height: 130px;
+    background: #e5edf7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 55px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+}
+
+.room-card p {
+    margin: 10px 0;
+}
+
+.price {
+    color: #16804a;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #24558b;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f2f6fb;
+}
+
+.admin {
+    border-top: 5px solid #e49b27;
+}
+
+.admin h2 {
+    color: #a96800;
+}
+
+footer {
+    background: #17365d;
+    color: white;
+    text-align: center;
+    padding: 22px;
+    line-height: 1.8;
+}
+
+@media (max-width: 600px) {
+    nav a {
+        display: inline-block;
+        margin: 7px;
+    }
+
+    .container {
+        width: 95%;
+    }
+
+    section {
+        padding: 15px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 7px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🏨 Grand Stay Hotel</h1>
+    <p>Your Comfort, Our Priority</p>
+</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#rooms">Rooms</a>
+    <a href="#booking">Book Room</a>
+    <a href="#login">Login</a>
+    <a href="#history">My Bookings</a>
+    <a href="#about">About Us</a>
+    <a href="#contact">Contact</a>
+    <a href="#admin">Admin</a>
+</nav>
+
+<div class="container">
+
+<!-- HOME -->
+<div class="hero" id="home">
+    <h2>Find Your Perfect Stay</h2>
+    <p>Explore comfortable rooms at affordable prices.</p>
+</div>
+
+<!-- HOTEL SEARCH -->
+<section>
+    <h2>Search Hotel Rooms</h2>
+
+    <form action="#rooms" method="get">
+        <label>Destination</label>
+        <input type="text" placeholder="Enter city or destination" required>
+
+        <label>Check-in Date</label>
+        <input type="date" required>
+
+        <label>Check-out Date</label>
+        <input type="date" required>
+
+        <label>Number of Guests</label>
+        <select>
+            <option>1 Guest</option>
+            <option>2 Guests</option>
+            <option>3 Guests</option>
+            <option>4 Guests</option>
+        </select>
+
+        <button type="submit">Search Availability</button>
+    </form>
+</section>
+
+<!-- FOUR ROOM TYPES -->
+<section id="rooms">
+    <h2>Our Room Types</h2>
+
+    <div class="rooms">
+
+        <div class="room-card">
+            <div class="room-image">🛏️</div>
+            <h3>Standard Room</h3>
+            <p>Comfortable room with basic facilities.</p>
+            <p>Wi-Fi, TV, AC</p>
+            <p class="price">₹1,500 / night</p>
+            <p>Rating: ★★★★☆</p>
+            <a href="#booking">
+                <button type="button">Book Now</button>
+            </a>
+        </div>
+
+        <div class="room-card">
+            <div class="room-image">🛌</div>
+            <h3>Deluxe Room</h3>
+            <p>Spacious room with premium comfort.</p>
+            <p>Wi-Fi, AC, TV, Breakfast</p>
+            <p class="price">₹2,500 / night</p>
+            <p>Rating: ★★★★★</p>
+            <a href="#booking">
+                <button type="button">Book Now</button>
+            </a>
+        </div>
+
+        <div class="room-card">
+            <div class="room-image">🏙️</div>
+            <h3>Executive Room</h3>
+            <p>Elegant room for business travelers.</p>
+            <p>Wi-Fi, Work Desk, AC</p>
+            <p class="price">₹3,500 / night</p>
+            <p>Rating: ★★★★☆</p>
+            <a href="#booking">
+                <button type="button">Book Now</button>
+            </a>
+        </div>
+
+        <div class="room-card">
+            <div class="room-image">👑</div>
+            <h3>Suite Room</h3>
+            <p>Luxury room with a separate living area.</p>
+            <p>Wi-Fi, Mini Bar, AC, Breakfast</p>
+            <p class="price">₹5,000 / night</p>
+            <p>Rating: ★★★★★</p>
+            <a href="#booking">
+                <button type="button">Book Now</button>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<!-- USER REGISTRATION -->
+<section id="register">
+    <h2>User Registration</h2>
+
+    <form>
+        <label>Full Name</label>
+        <input type="text" placeholder="Enter your name" required>
+
+        <label>Email</label>
+        <input type="email" placeholder="Enter email address" required>
+
+        <label>Phone Number</label>
+        <input type="tel" placeholder="Enter phone number">
+
+        <label>Password</label>
+        <input type="password" placeholder="Create password" required>
+
+        <button type="button">Register</button>
+    </form>
+</section>
+
+<!-- USER LOGIN -->
+<section id="login">
+    <h2>User Login</h2>
+
+    <form>
+        <label>Email Address</label>
+        <input type="email" placeholder="Enter registered email" required>
+
+        <label>Password</label>
+        <input type="password" placeholder="Enter password" required>
+
+        <button type="button">Login</button>
+    </form>
+</section>
+
+<!-- PROFILE -->
+<section id="profile">
+    <h2>My Profile</h2>
+
+    <form>
+        <label>Full Name</label>
+        <input type="text" placeholder="Enter full name">
+
+        <label>Email</label>
+        <input type="email" placeholder="Enter email">
+
+        <label>Phone Number</label>
+        <input type="tel" placeholder="Enter phone number">
+
+        <label>Address</label>
+        <textarea rows="3" placeholder="Enter address"></textarea>
+
+        <button type="button">Update Profile</button>
+    </form>
+</section>
+
+<!-- BOOKING -->
+<section id="booking">
+    <h2>Room Booking Form</h2>
+
+    <form>
+        <label>Guest Name</label>
+        <input type="text" placeholder="Enter guest name" required>
+
+        <label>Email Address</label>
+        <input type="email" placeholder="Enter email" required>
+
+        <label>Room Type</label>
+        <select required>
+            <option value="">Select room type</option>
+            <option>Standard Room - ₹1,500</option>
+            <option>Deluxe Room - ₹2,500</option>
+            <option>Executive Room - ₹3,500</option>
+            <option>Suite Room - ₹5,000</option>
+        </select>
+
+        <label>Check-in Date</label>
+        <input type="date" required>
+
+        <label>Check-out Date</label>
+        <input type="date" required>
+
+        <label>Number of Guests</label>
+        <input type="number" min="1" max="10" required>
+
+        <label>Special Requests</label>
+        <textarea rows="3" placeholder="Any special requests"></textarea>
+
+        <button type="button">Check Availability</button>
+        <button type="button">Confirm Booking</button>
+    </form>
+
+    <h3 style="margin-top:25px;">Payment Details</h3>
+    <p>Select your preferred payment method at checkout.</p>
+
+    <select>
+        <option>Choose Payment Method</option>
+        <option>Credit Card</option>
+        <option>Debit Card</option>
+        <option>UPI</option>
+        <option>Net Banking</option>
+    </select>
+
+    <button type="button">Proceed to Payment</button>
+</section>
+
+<!-- BOOKING HISTORY -->
+<section id="history">
+    <h2>My Booking History</h2>
+
+    <table>
+        <tr>
+            <th>Booking ID</th>
+            <th>Room Type</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>H101</td>
+            <td>Deluxe Room</td>
+            <td>20-10-2026</td>
+            <td>23-10-2026</td>
+            <td>Confirmed</td>
+            <td>
+                <button type="button">Modify</button>
+                <button type="button">Cancel</button>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin-top:15px;">
+        Booking changes and cancellations are permitted at least
+        3 days before the arrival date.
+    </p>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+    <h2>Customer Reviews</h2>
+
+    <form>
+        <label>Your Name</label>
+        <input type="text" placeholder="Enter name">
+
+        <label>Rating</label>
+        <select>
+            <option>5 Stars</option>
+            <option>4 Stars</option>
+            <option>3 Stars</option>
+            <option>2 Stars</option>
+            <option>1 Star</option>
+        </select>
+
+        <label>Your Review</label>
+        <textarea rows="4" placeholder="Write your experience"></textarea>
+
+        <button type="button">Submit Review</button>
+    </form>
+</section>
+
+<!-- ABOUT US -->
+<section id="about">
+    <h2>About Us</h2>
+    <p>
+        Grand Stay Hotel provides comfortable accommodation,
+        friendly service, and convenient booking facilities.
+        We aim to make every guest's stay enjoyable and relaxing.
+    </p>
+</section>
+
+<!-- CUSTOMER SERVICE FAQ -->
+<section id="faq">
+    <h2>Customer Service - FAQs</h2>
+
+    <h3>1. How can I book a room?</h3>
+    <p>Select your room, enter your dates and guest details,
+       and complete the booking process.</p>
+
+    <h3>2. Can I cancel my booking?</h3>
+    <p>The website's stated policy allows cancellation at least
+       three days before arrival.</p>
+
+    <h3>3. How can I contact the hotel?</h3>
+    <p>Use the contact form or the contact details below.</p>
+
+    <h3>4. Will I receive booking confirmation?</h3>
+    <p>A live system can send confirmation by email after a
+       successful booking.</p>
+</section>
+
+<!-- LOCAL TRAVEL GUIDE -->
+<section id="travel">
+    <h2>Local Travel Guide</h2>
+    <p>Guests can explore nearby tourist attractions, shopping
+       centers, restaurants, and public transport facilities.</p>
+    <p>Contact the hotel reception for travel guidance and
+       local transportation information.</p>
+</section>
+
+<!-- SHIPPING GUIDE -->
+<section id="shipping">
+    <h2>Shipping Guide</h2>
+    <p>For packages delivered to the hotel, guests should provide
+       their name, booking ID, and expected arrival date.</p>
+    <p>Please contact reception to confirm package acceptance
+       and collection arrangements.</p>
+</section>
+
+<!-- PRIVACY POLICY -->
+<section id="privacy">
+    <h2>Privacy Policy</h2>
+    <p>
+        Guest information should be collected only for legitimate
+        booking and service purposes. Personal details must be
+        stored securely and must not be shared without a valid
+        reason or appropriate authorization.
+    </p>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+    <h2>Contact Us</h2>
+
+    <p>Email: contact@grandstay.example</p>
+    <p>Phone: +91 98765 43210</p>
+    <p>Address: Main Road, Chennai, Tamil Nadu</p>
+
+    <form>
+        <label>Your Name</label>
+        <input type="text" placeholder="Enter your name" required>
+
+        <label>Email</label>
+        <input type="email" placeholder="Enter email" required>
+
+        <label>Message</label>
+        <textarea rows="4" placeholder="Enter your message"
+                  required></textarea>
+
+        <button type="button">Send Message</button>
+    </form>
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<section id="admin" class="admin">
+    <h2>Administrator Dashboard</h2>
+
+    <h3>Admin Login</h3>
+    <form>
+        <input type="text" placeholder="Admin username">
+        <input type="password" placeholder="Admin password">
+        <button type="button">Admin Login</button>
+    </form>
+
+    <h3 style="margin-top:25px;">Manage Room Quantity and Price</h3>
+
+    <form>
+        <label>Room Type</label>
+        <select>
+            <option>Standard Room</option>
+            <option>Deluxe Room</option>
+            <option>Executive Room</option>
+            <option>Suite Room</option>
+        </select>
+
+        <label>Available Room Quantity</label>
+        <input type="number" min="0" placeholder="Enter quantity">
+
+        <label>Price Per Night (₹)</label>
+        <input type="number" min="0" placeholder="Enter room price">
+
+        <button type="button">Update Room Details</button>
+    </form>
+
+    <h3 style="margin-top:25px;">Manage Bookings</h3>
+
+    <table>
+        <tr>
+            <th>Booking ID</th>
+            <th>Guest Name</th>
+            <th>Room</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>H101</td>
+            <td>Guest One</td>
+            <td>Deluxe Room</td>
+            <td>Confirmed</td>
+            <td>
+                <button type="button">Modify</button>
+                <button type="button">Cancel</button>
+            </td>
+        </tr>
+    </table>
+
+    <h3 style="margin-top:25px;">Manage Website Pages</h3>
+
+    <form>
+        <label>Select Page</label>
+        <select>
+            <option>Room Information</option>
+            <option>About Us</option>
+            <option>Contact Us</option>
+            <option>Customer Service FAQs</option>
+            <option>Local Travel Guide</option>
+            <option>Shipping Guide</option>
+            <option>Privacy Policy</option>
+        </select>
+
+        <label>Page Content</label>
+        <textarea rows="5" placeholder="Enter updated page content"></textarea>
+
+        <button type="button">Update Page</button>
+    </form>
+
+    <h3 style="margin-top:25px;">Manage User Accounts</h3>
+
+    <table>
+        <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>U101</td>
+            <td>Guest One</td>
+            <td>guest@example.com</td>
+            <td>Active</td>
+        </tr>
+    </table>
+</section>
+
+</div>
+
+<footer>
+    <p>&copy; 2026 Grand Stay Hotel | All Rights Reserved</p>
+    <p>Home | Rooms | Contact | Privacy Policy</p>
+</footer>
+
+</body>
+</html>
+```
