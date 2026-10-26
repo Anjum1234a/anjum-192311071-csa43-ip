@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteOnline - E-Voting System</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    margin: 0;
+    color: #1e293b;
+}
+header {
+    background: #1e3a8a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+.container {
+    max-width: 850px;
+    margin: 25px auto;
+    padding: 15px;
+}
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px #ccc;
+}
+input, select, button {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    margin: 7px 0;
+}
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:hover {
+    background: #1d4ed8;
+}
+.hidden {
+    display: none;
+}
+.item {
+    border: 1px solid #cbd5e1;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+small {
+    color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>VoteOnline</h1>
+    <p>Online Election Management System</p>
+</header>
+
+<div class="container">
+
+<div class="card" id="loginBox">
+    <h2>Login</h2>
+    <label>Login as</label>
+    <select id="role">
+        <option value="voter">Voter</option>
+        <option value="admin">Admin</option>
+    </select>
+
+    <input id="loginId" placeholder="Enter Voter ID or Admin ID">
+    <input id="loginPassword" type="password" placeholder="Enter password">
+
+    <button onclick="login()">Login</button>
+    <small>Demo Admin: admin / admin123</small>
+    <br>
+    <small>Demo Voter: V1001 / voter123</small>
+</div>
+
+<div id="adminPanel" class="hidden">
+
+    <div class="card">
+        <h2>Admin Dashboard</h2>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="card">
+        <h3>Create Election</h3>
+        <input id="electionName" placeholder="Election name">
+        <input id="electionDate" type="date">
+        <button onclick="createElection()">Create Election</button>
+        <p id="electionInfo"></p>
+    </div>
+
+    <div class="card">
+        <h3>Create Candidate</h3>
+        <input id="candidateName" placeholder="Candidate name">
+        <input id="candidateParty" placeholder="Party / Option">
+        <button onclick="createCandidate()">Add Candidate</button>
+        <div id="candidateList"></div>
+    </div>
+
+    <div class="card">
+        <h3>Voter List Management</h3>
+        <input id="voterId" placeholder="Voter ID">
+        <input id="voterName" placeholder="Voter name">
+        <input id="voterWard" placeholder="Ward number">
+        <input id="voterPassword" placeholder="Demo voter password">
+        <button onclick="addVoter()">Add Voter</button>
+
+        <h4>Import Voter List (CSV)</h4>
+        <input type="file" id="csvFile" accept=".csv">
+        <button onclick="importVoters()">Import CSV</button>
+
+        <div id="voterList"></div>
+        <small>
+            CSV format: voterId,name,ward,password
+        </small>
+    </div>
+
+    <div class="card">
+        <h3>Election Results</h3>
+        <button onclick="showResults()">View Results</button>
+        <div id="results"></div>
+    </div>
+</div>
+
+<div id="voterPanel" class="hidden">
+
+    <div class="card">
+        <h2>Voter Dashboard</h2>
+        <p id="voterWelcome"></p>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="card">
+        <h3>OTP Verification</h3>
+        <button onclick="generateOTP()">Get OTP for Voting</button>
+        <p id="otpMessage"></p>
+        <input id="otpInput" placeholder="Enter OTP">
+        <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+
+    <div class="card">
+        <h3>Cast Your Vote</h3>
+        <div id="votingOptions"></div>
+        <button onclick="submitVote()">Submit Vote</button>
+        <p id="voteMessage"></p>
+    </div>
+
+    <div class="card">
+        <h3>Voting History</h3>
+        <div id="votingHistory"></div>
+    </div>
+</div>
+
+</div>
+
+<script>
+const accounts = [
+    { id: "admin", password: "admin123", role: "admin" },
+    { id: "V1001", name: "Demo Voter", password: "voter123",
+      ward: "1", role: "voter" }
+];
+
+let candidates = [];
+let election = null;
+let votes = [];
+let currentUser = null;
+let otp = "";
+let otpVerified = false;
+let selectedCandidate = "";
+
+function login() {
+    const id = document.getElementById("loginId").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const role = document.getElementById("role").value;
+
+    const account = accounts.find(a =>
+        a.id === id && a.password === password && a.role === role
+    );
+
+    if (!account) {
+        alert("Invalid login details.");
+        return;
+    }
+
+    currentUser = account;
+    document.getElementById("loginBox").classList.add("hidden");
+
+    if (role === "admin") {
+        document.getElementById("adminPanel").classList.remove("hidden");
+        renderCandidates();
+        renderVoters();
+    } else {
+        document.getElementById("voterPanel").classList.remove("hidden");
+        document.getElementById("voterWelcome").textContent =
+            "Welcome, " + account.name + " | Ward: " + account.ward;
+        renderVotingOptions();
+        renderHistory();
+    }
+}
+
+function createElection() {
+    const name = document.getElementById("electionName").value.trim();
+    const date = document.getElementById("electionDate").value;
+
+    if (!name || !date) {
+        alert("Enter election name and date.");
+        return;
+    }
+
+    election = { name, date };
+    document.getElementById("electionInfo").textContent =
+        "Election: " + name + " | Date: " + date;
+    alert("Election created.");
+}
+
+function createCandidate() {
+    const name = document.getElementById("candidateName").value.trim();
+    const party = document.getElementById("candidateParty").value.trim();
+
+    if (!name || !party) {
+        alert("Enter candidate name and party.");
+        return;
+    }
+
+    candidates.push({ name, party });
+    document.getElementById("candidateName").value = "";
+    document.getElementById("candidateParty").value = "";
+    renderCandidates();
+    renderVotingOptions();
+}
+
+function renderCandidates() {
+    document.getElementById("candidateList").innerHTML =
+        candidates.length ? candidates.map((c, i) =>
+            `<div class="item">${escapeHTML(c.name)} — ${escapeHTML(c.party)}
+            <button onclick="deleteCandidate(${i})">Delete</button></div>`
+        ).join("") : "No candidates added.";
+}
+
+function deleteCandidate(index) {
+    if (votes.length > 0) {
+        alert("Candidates cannot be deleted after votes have been cast.");
+        return;
+    }
+    candidates.splice(index, 1);
+    renderCandidates();
+    renderVotingOptions();
+}
+
+function addVoter() {
+    const id = document.getElementById("voterId").value.trim();
+    const name = document.getElementById("voterName").value.trim();
+    const ward = document.getElementById("voterWard").value.trim();
+    const password = document.getElementById("voterPassword").value;
+
+    if (!id || !name || !ward || !password) {
+        alert("Fill in all voter details.");
+        return;
+    }
+
+    if (accounts.some(a => a.id === id)) {
+        alert("Voter ID already exists.");
+        return;
+    }
+
+    accounts.push({ id, name, ward, password, role: "voter" });
+    renderVoters();
+    alert("Voter added successfully.");
+}
+
+function renderVoters() {
+    const voters = accounts.filter(a => a.role === "voter");
+
+    document.getElementById("voterList").innerHTML =
+        voters.map((v, i) =>
+            `<div class="item">
+            ${escapeHTML(v.id)} — ${escapeHTML(v.name)}
+            (Ward ${escapeHTML(v.ward)})
+            <button onclick="editVoter('${v.id}')">Update</button>
+            <button onclick="deleteVoter('${v.id}')">Delete</button>
+            </div>`
+        ).join("");
+}
+
+function editVoter(id) {
+    const voter = accounts.find(a => a.id === id);
+    const ward = prompt("Enter new ward:", voter.ward);
+    if (ward === null || !ward.trim()) return;
+    voter.ward = ward.trim();
+    renderVoters();
+}
+
+function deleteVoter(id) {
+    if (votes.some(v => v.voterId === id)) {
+        alert("This voter has already voted and cannot be deleted in this demo.");
+        return;
+    }
+
+    const index = accounts.findIndex(a => a.id === id);
+    if (index !== -1) accounts.splice(index, 1);
+    renderVoters();
+}
+
+function importVoters() {
+    const file = document.getElementById("csvFile").files[0];
+    if (!file) {
+        alert("Choose a CSV file.");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+        const lines = event.target.result.trim().split(/\r?\n/);
+        let added = 0;
+
+        lines.slice(1).forEach(line => {
+            const parts = line.split(",").map(x => x.trim());
+            if (parts.length < 4) return;
+
+            const [id, name, ward, password] = parts;
+
+            if (id && name && ward && password &&
+                !accounts.some(a => a.id === id)) {
+                accounts.push({ id, name, ward, password, role: "voter" });
+                added++;
+            }
+        });
+
+        renderVoters();
+        alert(added + " voter(s) imported.");
+    };
+
+    reader.readAsText(file);
+}
+
+function generateOTP() {
+    if (votes.some(v => v.voterId === currentUser.id)) {
+        alert("You have already voted.");
+        return;
+    }
+
+    if (!election) {
+        alert("Admin must create an election first.");
+        return;
+    }
+
+    if (candidates.length === 0) {
+        alert("No candidates are available.");
+        return;
+    }
+
+    // DEMO ONLY: real OTP must be sent and verified by a backend.
+    otp = String(Math.floor(100000 + Math.random() * 900000));
+    otpVerified = false;
+
+    document.getElementById("otpMessage").textContent =
+        "Demo OTP: " + otp + " (not secure; displayed only for lab testing)";
+}
+
+function verifyOTP() {
+    if (otp && document.getElementById("otpInput").value === otp) {
+        otpVerified = true;
+        document.getElementById("otpMessage").textContent =
+            "OTP verified. You can now select and submit your vote.";
+        renderVotingOptions();
+    } else {
+        alert("Incorrect OTP. Please try again.");
+    }
+}
+
+function renderVotingOptions() {
+    const container = document.getElementById("votingOptions");
+    if (!container) return;
+
+    if (votes.some(v => currentUser && v.voterId === currentUser.id)) {
+        container.textContent = "Your vote has already been submitted.";
+        return;
+    }
+
+    if (!election) {
+        container.textContent = "No election has been created yet.";
+        return;
+    }
+
+    if (!candidates.length) {
+        container.textContent = "No candidates available.";
+        return;
+    }
+
+    container.innerHTML = candidates.map((c, i) =>
+        `<div class="item">
+        <label>
+        <input type="radio" name="candidate" value="${i}"
+        ${!otpVerified ? "disabled" : ""} style="width:auto">
+        ${escapeHTML(c.name)} — ${escapeHTML(c.party)}
+        </label>
+        </div>`
+    ).join("");
+}
+
+function submitVote() {
+    if (!currentUser || currentUser.role !== "voter") return;
+
+    if (!otpVerified) {
+        alert("Please verify OTP first.");
+        return;
+    }
+
+    if (votes.some(v => v.voterId === currentUser.id)) {
+        alert("You have already voted.");
+        return;
+    }
+
+    const chosen = document.querySelector('input[name="candidate"]:checked');
+
+    if (!chosen) {
+        alert("Please select a candidate.");
+        return;
+    }
+
+    const candidate = candidates[Number(chosen.value)];
+
+    // Demo stores the voter ID with the vote; real elections need
+    // stronger privacy, security, and independent audit protections.
+    votes.push({
+        voterId: currentUser.id,
+        candidate: candidate.name,
+        election: election.name,
+        time: new Date().toLocaleString()
+    });
+
+    otp = "";
+    otpVerified = false;
+    document.getElementById("otpInput").value = "";
+    document.getElementById("otpMessage").textContent = "";
+    document.getElementById("voteMessage").textContent =
+        "Vote submitted successfully! Confirmation ID: VOTE-" +
+        Date.now();
+
+    renderVotingOptions();
+    renderHistory();
+}
+
+function renderHistory() {
+    const history = votes.filter(v => v.voterId === currentUser.id);
+
+    document.getElementById("votingHistory").innerHTML =
+        history.length ? history.map(v =>
+            `<div class="item">
+            Election: ${escapeHTML(v.election)}<br>
+            Confirmation time: ${escapeHTML(v.time)}<br>
+            Vote submitted successfully.
+            </div>`
+        ).join("") : "No voting history available.";
+}
+
+function showResults() {
+    const output = document.getElementById("results");
+
+    if (!candidates.length) {
+        output.textContent = "No candidates available.";
+        return;
+    }
+
+    output.innerHTML = candidates.map(c => {
+        const count = votes.filter(v => v.candidate === c.name).length;
+        return `<div class="item">
+        ${escapeHTML(c.name)} — ${escapeHTML(c.party)}:
+        ${count} vote(s)</div>`;
+    }).join("") + `<p>Total votes: ${votes.length}</p>`;
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[ch]);
+}
+
+function logout() {
+    currentUser = null;
+    otp = "";
+    otpVerified = false;
+
+    document.getElementById("adminPanel").classList.add("hidden");
+    document.getElementById("voterPanel").classList.add("hidden");
+    document.getElementById("loginBox").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
