@@ -1,0 +1,722 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriMart - Agricultural Shopping</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f7f0;
+    margin: 0;
+    color: #263326;
+}
+header {
+    background: #28643a;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+.container {
+    max-width: 950px;
+    margin: 25px auto;
+    padding: 15px;
+}
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px #ccc;
+}
+input, select, textarea, button {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    margin: 7px 0;
+}
+button {
+    background: #347d3e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:hover {
+    background: #205a2c;
+}
+.hidden {
+    display: none;
+}
+.product {
+    border: 1px solid #d5e2d0;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 12px 0;
+}
+.product img {
+    max-width: 150px;
+    max-height: 120px;
+    object-fit: contain;
+    display: block;
+}
+small {
+    color: #64748b;
+}
+</style>
+</head>
+
+<body>
+<header>
+    <h1>AgriMart</h1>
+    <p>Your Online Agricultural Marketplace</p>
+</header>
+
+<div class="container">
+
+<div class="card" id="loginPanel">
+    <h2>Login / Register</h2>
+
+    <select id="role">
+        <option value="public">Public / Customer</option>
+        <option value="farmer">Farmer</option>
+    </select>
+
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+
+    <small>Demo farmer: farmer / farm123</small><br>
+    <small>Demo customer: customer / cust123</small>
+</div>
+
+<div id="dashboard" class="hidden">
+    <div class="card">
+        <h2 id="welcome"></h2>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- CUSTOMER SECTION -->
+    <div id="customerPanel" class="hidden">
+
+        <div class="card">
+            <h3>OTP Verification</h3>
+            <button onclick="generateOTP()">Get OTP</button>
+            <p id="otpMessage"></p>
+            <input id="otpInput" placeholder="Enter OTP">
+            <button onclick="verifyOTP()">Verify OTP</button>
+        </div>
+
+        <div class="card">
+            <h3>My Account and Wallet</h3>
+            <p id="walletInfo"></p>
+            <input id="walletAmount" type="number" min="1"
+                   placeholder="Amount to add">
+            <button onclick="addWallet()">Add Demo Wallet Balance</button>
+        </div>
+
+        <div class="card">
+            <h3>Search Agricultural Products</h3>
+            <input id="search" placeholder="Search seeds, tools, fertilizer..."
+                   oninput="renderProducts()">
+            <select id="categoryFilter" onchange="renderProducts()">
+                <option value="All">All Categories</option>
+                <option>Seeds</option>
+                <option>Fertilizers</option>
+                <option>Pesticides</option>
+                <option>Equipment</option>
+                <option>Tools</option>
+            </select>
+            <div id="products"></div>
+        </div>
+
+        <div class="card">
+            <h3>Shopping Cart</h3>
+            <div id="cart"></div>
+            <p id="cartTotal"></p>
+            <button onclick="checkout()">Order Products</button>
+        </div>
+
+        <div class="card">
+            <h3>Shipping Address</h3>
+            <textarea id="address" placeholder="Enter your full shipping address"></textarea>
+            <button onclick="saveAddress()">Save Address</button>
+            <p id="addressInfo"></p>
+        </div>
+
+        <div class="card">
+            <h3>My Orders and Shipping Status</h3>
+            <div id="myOrders"></div>
+        </div>
+    </div>
+
+    <!-- FARMER SECTION -->
+    <div id="farmerPanel" class="hidden">
+
+        <div class="card">
+            <h3>Add Product</h3>
+            <input id="productName" placeholder="Product name">
+            <select id="productCategory">
+                <option>Seeds</option>
+                <option>Fertilizers</option>
+                <option>Pesticides</option>
+                <option>Equipment</option>
+                <option>Tools</option>
+            </select>
+            <input id="productPrice" type="number" min="1" placeholder="Price in ₹">
+            <input id="productStock" type="number" min="1" placeholder="Quantity available">
+            <textarea id="productDescription" placeholder="Product description"></textarea>
+            <label>Product image:</label>
+            <input id="productImage" type="file" accept="image/*">
+            <button onclick="addProduct()">Add Product</button>
+        </div>
+
+        <div class="card">
+            <h3>Update / Delete My Products</h3>
+            <div id="farmerProducts"></div>
+        </div>
+
+        <div class="card">
+            <h3>Manage Orders and Shipping</h3>
+            <div id="farmerOrders"></div>
+        </div>
+
+        <div class="card">
+            <h3>My Sales</h3>
+            <div id="sales"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+let users = [
+    { username: "farmer", password: "farm123", role: "farmer", wallet: 0 },
+    { username: "customer", password: "cust123", role: "public", wallet: 1000 }
+];
+
+let products = [
+    {
+        id: 1,
+        name: "Tomato Seeds",
+        category: "Seeds",
+        price: 100,
+        stock: 20,
+        description: "Quality seeds for growing tomatoes.",
+        farmer: "farmer",
+        image: ""
+    },
+    {
+        id: 2,
+        name: "Organic Fertilizer",
+        category: "Fertilizers",
+        price: 250,
+        stock: 15,
+        description: "Fertilizer for garden and farm plants.",
+        farmer: "farmer",
+        image: ""
+    }
+];
+
+let orders = [];
+let cart = [];
+let currentUser = null;
+let nextProductId = 3;
+let nextOrderId = 1;
+let otp = "";
+let otpVerified = false;
+let savedAddress = "";
+
+function register() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
+
+    if (!username || !password) {
+        alert("Enter username and password.");
+        return;
+    }
+
+    if (users.some(u => u.username === username)) {
+        alert("Username already exists.");
+        return;
+    }
+
+    users.push({ username, password, role, wallet: 0 });
+    alert("Registration successful. Please log in.");
+}
+
+function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
+
+    const user = users.find(u =>
+        u.username === username &&
+        u.password === password &&
+        u.role === role
+    );
+
+    if (!user) {
+        alert("Invalid login details.");
+        return;
+    }
+
+    currentUser = user;
+    cart = [];
+    otp = "";
+    otpVerified = false;
+
+    document.getElementById("loginPanel").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("welcome").textContent =
+        "Welcome, " + user.username;
+
+    document.getElementById("customerPanel").classList.add("hidden");
+    document.getElementById("farmerPanel").classList.add("hidden");
+
+    if (user.role === "public") {
+        document.getElementById("customerPanel").classList.remove("hidden");
+        renderProducts();
+        renderCart();
+        renderOrders();
+        renderWallet();
+        renderAddress();
+    } else {
+        document.getElementById("farmerPanel").classList.remove("hidden");
+        renderFarmerProducts();
+        renderFarmerOrders();
+        renderSales();
+    }
+}
+
+function generateOTP() {
+    otp = String(Math.floor(100000 + Math.random() * 900000));
+    otpVerified = false;
+
+    // Demonstration only: a real OTP must be sent through a secure backend.
+    document.getElementById("otpMessage").textContent =
+        "Demo OTP: " + otp;
+}
+
+function verifyOTP() {
+    const entered = document.getElementById("otpInput").value.trim();
+
+    if (otp && entered === otp) {
+        otpVerified = true;
+        otp = "";
+        document.getElementById("otpMessage").textContent =
+            "OTP verified successfully.";
+        alert("Verification successful.");
+    } else {
+        alert("Invalid OTP. Please try again.");
+    }
+}
+
+function renderWallet() {
+    document.getElementById("walletInfo").textContent =
+        "Wallet Balance: ₹" + currentUser.wallet;
+}
+
+function addWallet() {
+    const amount = Number(document.getElementById("walletAmount").value);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        alert("Enter a valid amount.");
+        return;
+    }
+
+    // Demo wallet: no real money or payment is processed.
+    currentUser.wallet += amount;
+    document.getElementById("walletAmount").value = "";
+    renderWallet();
+    alert("Demo wallet balance updated.");
+}
+
+function renderProducts() {
+    const query = document.getElementById("search").value.toLowerCase();
+    const category = document.getElementById("categoryFilter").value;
+
+    const filtered = products.filter(p =>
+        p.name.toLowerCase().includes(query) &&
+        (category === "All" || p.category === category) &&
+        p.stock > 0
+    );
+
+    document.getElementById("products").innerHTML =
+        filtered.length ? filtered.map(p => `
+            <div class="product">
+                ${p.image ? `<img src="${p.image}" alt="Product image">` : ""}
+                <h4>${escapeHTML(p.name)}</h4>
+                <p>Category: ${escapeHTML(p.category)}</p>
+                <p>Price: ₹${p.price}</p>
+                <p>Available quantity: ${p.stock}</p>
+                <p>${escapeHTML(p.description)}</p>
+                <button onclick="addToCart(${p.id})">Add to Cart</button>
+            </div>
+        `).join("") : "No matching products found.";
+}
+
+function addToCart(id) {
+    const product = products.find(p => p.id === id);
+    const item = cart.find(c => c.id === id);
+
+    if (!product || product.stock <= 0) {
+        alert("Product is unavailable.");
+        return;
+    }
+
+    if (item) {
+        if (item.quantity >= product.stock) {
+            alert("Maximum available quantity reached.");
+            return;
+        }
+        item.quantity++;
+    } else {
+        cart.push({ id, quantity: 1 });
+    }
+
+    renderCart();
+}
+
+function renderCart() {
+    const container = document.getElementById("cart");
+
+    if (!cart.length) {
+        container.textContent = "Your cart is empty.";
+        document.getElementById("cartTotal").textContent = "";
+        return;
+    }
+
+    let total = 0;
+
+    container.innerHTML = cart.map(item => {
+        const p = products.find(p => p.id === item.id);
+        if (!p) return "";
+
+        total += p.price * item.quantity;
+
+        return `
+            <div class="product">
+                <b>${escapeHTML(p.name)}</b>
+                <p>Price: ₹${p.price}</p>
+                <label>Quantity</label>
+                <input type="number" min="1" max="${p.stock}"
+                    value="${item.quantity}"
+                    onchange="updateCart(${p.id}, this.value)">
+                <button onclick="removeCart(${p.id})">Remove</button>
+            </div>
+        `;
+    }).join("");
+
+    document.getElementById("cartTotal").textContent = "Total: ₹" + total;
+}
+
+function updateCart(id, value) {
+    const item = cart.find(c => c.id === id);
+    const product = products.find(p => p.id === id);
+    if (!item || !product) return;
+
+    const quantity = Number(value);
+
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > product.stock) {
+        alert("Enter a valid quantity.");
+        renderCart();
+        return;
+    }
+
+    item.quantity = quantity;
+    renderCart();
+}
+
+function removeCart(id) {
+    cart = cart.filter(c => c.id !== id);
+    renderCart();
+}
+
+function saveAddress() {
+    const address = document.getElementById("address").value.trim();
+
+    if (!address) {
+        alert("Enter your shipping address.");
+        return;
+    }
+
+    savedAddress = address;
+    renderAddress();
+    alert("Shipping address saved.");
+}
+
+function renderAddress() {
+    document.getElementById("address").value = savedAddress;
+    document.getElementById("addressInfo").textContent =
+        savedAddress ? "Saved address: " + savedAddress : "No address saved.";
+}
+
+function checkout() {
+    if (!otpVerified) {
+        alert("Please verify OTP before ordering.");
+        return;
+    }
+
+    if (!cart.length) {
+        alert("Your cart is empty.");
+        return;
+    }
+
+    if (!savedAddress) {
+        alert("Please save your shipping address.");
+        return;
+    }
+
+    for (const item of cart) {
+        const p = products.find(p => p.id === item.id);
+        if (!p || item.quantity > p.stock) {
+            alert("Insufficient stock for one or more products.");
+            return;
+        }
+    }
+
+    const total = cart.reduce((sum, item) => {
+        const p = products.find(p => p.id === item.id);
+        return sum + p.price * item.quantity;
+    }, 0);
+
+    if (currentUser.wallet < total) {
+        alert("Insufficient demo wallet balance.");
+        return;
+    }
+
+    currentUser.wallet -= total;
+
+    cart.forEach(item => {
+        const p = products.find(p => p.id === item.id);
+        p.stock -= item.quantity;
+
+        orders.push({
+            id: nextOrderId++,
+            productId: p.id,
+            productName: p.name,
+            quantity: item.quantity,
+            price: p.price,
+            total: p.price * item.quantity,
+            buyer: currentUser.username,
+            farmer: p.farmer,
+            address: savedAddress,
+            status: "Order Placed",
+            shipping: "Not Shipped"
+        });
+    });
+
+    cart = [];
+    otpVerified = false;
+    document.getElementById("otpInput").value = "";
+    document.getElementById("otpMessage").textContent = "";
+    renderCart();
+    renderOrders();
+    renderProducts();
+    renderWallet();
+
+    alert("Order placed successfully!");
+}
+
+function renderOrders() {
+    const mine = orders.filter(o => o.buyer === currentUser.username);
+
+    document.getElementById("myOrders").innerHTML =
+        mine.length ? mine.map(o => `
+            <div class="product">
+                <b>Order #${o.id}</b>
+                <p>Product: ${escapeHTML(o.productName)}</p>
+                <p>Quantity: ${o.quantity}</p>
+                <p>Total: ₹${o.total}</p>
+                <p>Order Status: ${escapeHTML(o.status)}</p>
+                <p>Shipping Status: ${escapeHTML(o.shipping)}</p>
+            </div>
+        `).join("") : "You have no orders yet.";
+}
+
+function renderFarmerProducts() {
+    const mine = products.filter(p => p.farmer === currentUser.username);
+
+    document.getElementById("farmerProducts").innerHTML =
+        mine.length ? mine.map(p => `
+            <div class="product">
+                <b>${escapeHTML(p.name)}</b>
+                <p>Category: ${escapeHTML(p.category)}</p>
+                <p>Price: ₹${p.price} | Stock: ${p.stock}</p>
+                <button onclick="editProduct(${p.id})">Edit Product</button>
+                <button onclick="deleteProduct(${p.id})">Delete Product</button>
+            </div>
+        `).join("") : "You have not added any products.";
+}
+
+function addProduct() {
+    const name = document.getElementById("productName").value.trim();
+    const category = document.getElementById("productCategory").value;
+    const price = Number(document.getElementById("productPrice").value);
+    const stock = Number(document.getElementById("productStock").value);
+    const description = document.getElementById("productDescription").value.trim();
+    const file = document.getElementById("productImage").files[0];
+
+    if (!name || !description || !Number.isFinite(price) ||
+        price <= 0 || !Number.isInteger(stock) || stock < 1) {
+        alert("Enter valid product details and stock quantity.");
+        return;
+    }
+
+    function save(image) {
+        products.push({
+            id: nextProductId++,
+            name, category, price, stock, description,
+            farmer: currentUser.username,
+            image
+        });
+
+        renderFarmerProducts();
+        alert("Product added successfully.");
+    }
+
+    if (file) {
+        if (!file.type.startsWith("image/")) {
+            alert("Please select an image file.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = e => save(e.target.result);
+        reader.readAsDataURL(file);
+    } else {
+        save("");
+    }
+}
+
+function editProduct(id) {
+    const p = products.find(p =>
+        p.id === id && p.farmer === currentUser.username
+    );
+    if (!p) return;
+
+    const name = prompt("Product name:", p.name);
+    if (name === null || !name.trim()) return;
+
+    const price = Number(prompt("Price:", p.price));
+    if (!Number.isFinite(price) || price <= 0) {
+        alert("Invalid price.");
+        return;
+    }
+
+    const stock = Number(prompt("Available quantity:", p.stock));
+    if (!Number.isInteger(stock) || stock < 0) {
+        alert("Invalid stock quantity.");
+        return;
+    }
+
+    p.name = name.trim();
+    p.price = price;
+    p.stock = stock;
+
+    renderFarmerProducts();
+    renderProducts();
+}
+
+function deleteProduct(id) {
+    const p = products.find(p =>
+        p.id === id && p.farmer === currentUser.username
+    );
+    if (!p) return;
+
+    if (orders.some(o => o.productId === id)) {
+        alert("This product has order history and cannot be deleted in this demo.");
+        return;
+    }
+
+    products = products.filter(p => p.id !== id);
+    cart = cart.filter(c => c.id !== id);
+    renderFarmerProducts();
+    renderProducts();
+    renderCart();
+}
+
+function renderFarmerOrders() {
+    const mine = orders.filter(o => o.farmer === currentUser.username);
+
+    document.getElementById("farmerOrders").innerHTML =
+        mine.length ? mine.map(o => `
+            <div class="product">
+                <b>Order #${o.id}: ${escapeHTML(o.productName)}</b>
+                <p>Customer: ${escapeHTML(o.buyer)}</p>
+                <p>Shipping address: ${escapeHTML(o.address)}</p>
+                <p>Order status: ${escapeHTML(o.status)}</p>
+                <p>Shipping status: ${escapeHTML(o.shipping)}</p>
+
+                <select id="status${o.id}">
+                    <option>Order Placed</option>
+                    <option>Processing</option>
+                    <option>Confirmed</option>
+                    <option>Cancelled</option>
+                </select>
+
+                <select id="shipping${o.id}">
+                    <option>Not Shipped</option>
+                    <option>Shipped</option>
+                    <option>In Transit</option>
+                    <option>Delivered</option>
+                </select>
+
+                <button onclick="updateOrder(${o.id})">Update Order</button>
+            </div>
+        `).join("") : "No orders received.";
+}
+
+function updateOrder(id) {
+    const o = orders.find(o =>
+        o.id === id && o.farmer === currentUser.username
+    );
+    if (!o) return;
+
+    o.status = document.getElementById("status" + id).value;
+    o.shipping = document.getElementById("shipping" + id).value;
+
+    renderFarmerOrders();
+    renderOrders();
+    alert("Order and shipping status updated.");
+}
+
+function renderSales() {
+    const mine = orders.filter(o => o.farmer === currentUser.username);
+    const total = mine
+        .filter(o => o.status !== "Cancelled")
+        .reduce((sum, o) => sum + o.total, 0);
+
+    document.getElementById("sales").innerHTML =
+        "<p>Total orders: " + mine.length + "</p>" +
+        "<p>Total sales value (excluding cancelled orders): ₹" + total + "</p>";
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[ch]);
+}
+
+function logout() {
+    currentUser = null;
+    otp = "";
+    otpVerified = false;
+    cart = [];
+
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("loginPanel").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
