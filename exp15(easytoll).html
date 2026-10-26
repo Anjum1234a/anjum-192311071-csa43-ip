@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>ComplainEase - Complaint Management</title>
+<style>
+body{font-family:Arial;background:#f2f4f8;margin:0}
+header{background:#4338a8;color:white;text-align:center;padding:18px}
+.container{background:white;max-width:900px;margin:20px auto;padding:20px;border-radius:8px}
+input,textarea,select{display:block;width:95%;padding:10px;margin:8px 0;box-sizing:border-box}
+button{background:#4338a8;color:white;padding:10px;border:0;margin:5px;cursor:pointer}
+nav{text-align:center;background:#e3e0ff;padding:10px}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid #ccc;padding:9px;text-align:left}
+</style>
+</head>
+<body>
+<header><h1>ComplainEase</h1><p>Register. Track. Resolve.</p></header>
+
+<div class="container" id="login">
+<h2>Login / Register</h2>
+<select id="role"><option>User</option><option>Officer</option><option>Admin</option></select>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+<p id="msg"></p>
+<small>Demo admin: admin / admin123<br>Demo officer: officer / off123</small>
+</div>
+
+<div id="app" class="hidden">
+<nav>
+<button onclick="show('complaint')">Post Complaint</button>
+<button onclick="show('status')">Complaint Status</button>
+<button onclick="show('officer')">Officer Panel</button>
+<button onclick="show('admin')">Admin Panel</button>
+<button onclick="logout()">Logout</button>
+</nav>
+
+<div class="container" id="complaint">
+<h2>Register a Complaint</h2>
+<input id="subject" placeholder="Complaint title">
+<select id="category">
+<option>Road</option><option>Water</option><option>Electricity</option>
+<option>Sanitation</option><option>Other</option>
+</select>
+<textarea id="description" placeholder="Describe your complaint"></textarea>
+<input id="place" placeholder="Location / address">
+<input id="proof" type="file" accept="image/*,.pdf">
+<button onclick="postComplaint()">Submit Complaint</button>
+<p id="postMsg"></p>
+<p><b>Admin contact:</b> admin@complainease.example (demo)</p>
+</div>
+
+<div class="container hidden" id="status">
+<h2>Complaint History and Status</h2>
+<table>
+<thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Feedback</th></tr></thead>
+<tbody id="complaintList"></tbody>
+</table>
+</div>
+
+<div class="container hidden" id="officer">
+<h2>Officer Panel</h2>
+<p>View complaints and update their status.</p>
+<div id="officerList"></div>
+</div>
+
+<div class="container hidden" id="admin">
+<h2>Administrator Panel</h2>
+<input id="officerName" placeholder="New officer username">
+<input id="officerPassword" placeholder="Temporary password">
+<button onclick="createOfficer()">Create Officer Account</button>
+<h3>All Complaints</h3>
+<div id="adminList"></div>
+<h3>Accounts</h3>
+<div id="accountList"></div>
+</div>
+</div>
+
+<script>
+let users=[
+{username:"admin",password:"admin123",role:"Admin"},
+{username:"officer",password:"off123",role:"Officer"}
+];
+let current=null,complaints=[],nextId=1;
+
+function login(){
+let u=username.value,p=password.value,r=role.value;
+let found=users.find(x=>x.username===u&&x.password===p&&x.role===r);
+if(!found){msg.textContent="Invalid login details.";return}
+current=found;document.getElementById("login").classList.add("hidden");
+app.classList.remove("hidden");render();
+}
+function register(){
+let u=username.value.trim(),p=password.value,r=role.value;
+if(r!=="User")return alert("Only user registration is open. Admin creates officer accounts.");
+if(!u||!p)return alert("Enter username and password.");
+if(users.some(x=>x.username===u))return alert("Username already exists.");
+users.push({username:u,password:p,role:r});msg.textContent="Registered. Please login.";
+}
+function logout(){current=null;app.classList.add("hidden");document.getElementById("login").classList.remove("hidden")}
+function show(id){
+if(id==="officer"&&current.role!=="Officer")return alert("Officer access only.");
+if(id==="admin"&&current.role!=="Admin")return alert("Admin access only.");
+if(["complaint","status"].includes(id)&&current.role!=="User")return alert("User access only.");
+["complaint","status","officer","admin"].forEach(x=>document.getElementById(x).classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");render();
+}
+function postComplaint(){
+let s=subject.value.trim(),d=description.value.trim(),l=place.value.trim();
+if(!s||!d||!l)return alert("Fill in title, description and location.");
+complaints.push({id:nextId++,user:current.username,title:s,category:category.value,description:d,place:l,status:"Submitted",feedback:"",proof:""});
+postMsg.textContent="Complaint submitted successfully.";
+subject.value="";description.value="";place.value="";proof.value="";
+render();
+}
+function updateStatus(id,value){
+if(current.role!=="Officer"&&current.role!=="Admin")return;
+let c=complaints.find(x=>x.id===id);if(c)c.status=value;render();
+}
+function feedback(id){
+let c=complaints.find(x=>x.id===id&&x.user===current.username);
+if(!c)return;
+let f=prompt("Enter your feedback:");
+if(f!==null){c.feedback=f;render()}
+}
+function createOfficer(){
+if(current.role!=="Admin")return;
+let u=officerName.value.trim(),p=officerPassword.value;
+if(!u||!p)return alert("Enter username and password.");
+if(users.some(x=>x.username===u))return alert("Username already exists.");
+users.push({username:u,password:p,role:"Officer"});
+officerName.value="";officerPassword.value="";render();
+}
+function deleteAccount(name){
+if(current.role!=="Admin"||name==="admin")return;
+users=users.filter(x=>x.username!==name);
+render();
+}
+function escapeHTML(s){
+return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function render(){
+let own=complaints.filter(c=>c.user===current.username);
+document.getElementById("complaintList").innerHTML=own.map(c=>
+`<tr><td>${c.id}</td><td>${escapeHTML(c.title)}</td><td>${c.status}</td><td>${escapeHTML(c.feedback)} <button onclick="feedback(${c.id})">Feedback</button></td></tr>`).join("");
+let list=complaints.map(c=>`<div><hr><b>#${c.id} ${escapeHTML(c.title)}</b><p>${escapeHTML(c.description)}</p><p>Location: ${escapeHTML(c.place)} | Status: ${c.status}</p><select id="st${c.id}"><option>Submitted</option><option>In Progress</option><option>Resolved</option><option>Rejected</option></select><button onclick="updateStatus(${c.id},document.getElementById('st${c.id}').value)">Update Status</button></div>`).join("");
+document.getElementById("officerList").innerHTML=list;
+document.getElementById("adminList").innerHTML=list;
+document.getElementById("accountList").innerHTML=users.map(u=>`<p>${escapeHTML(u.username)} (${u.role}) ${u.username!=="admin"?`<button onclick="deleteAccount('${escapeHTML(u.username)}')">Delete</button>`:""}</p>`).join("");
+}
+</script>
+</body>
+</html>
