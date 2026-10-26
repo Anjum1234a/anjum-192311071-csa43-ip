@@ -1,0 +1,622 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vetcure - Veterinary Care System</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f0f7f4;
+    color: #24352b;
+}
+header {
+    background: #176b55;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+.container {
+    max-width: 950px;
+    margin: 25px auto;
+    padding: 15px;
+}
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px #ccc;
+}
+input, select, textarea, button {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px;
+    margin: 7px 0;
+}
+button {
+    background: #168064;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:hover {
+    background: #105d49;
+}
+.hidden {
+    display: none;
+}
+.item {
+    border: 1px solid #d4e3db;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+small {
+    color: #64748b;
+}
+</style>
+</head>
+
+<body>
+<header>
+    <h1>Vetcure</h1>
+    <p>Online Veterinary Consultation and Animal Healthcare</p>
+</header>
+
+<div class="container">
+
+<div class="card" id="loginPanel">
+    <h2>Register / Login</h2>
+
+    <select id="role">
+        <option value="farmer">Farmer</option>
+        <option value="doctor">Doctor</option>
+    </select>
+
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+
+    <small>Demo farmer: farmer / farm123</small><br>
+    <small>Demo doctor: doctor / doc123</small>
+</div>
+
+<div id="dashboard" class="hidden">
+    <div class="card">
+        <h2 id="welcome"></h2>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- FARMER DASHBOARD -->
+    <div id="farmerPanel" class="hidden">
+
+        <div class="card">
+            <h3>My Profile</h3>
+            <input id="animalName" placeholder="Animal name">
+            <input id="animalType" placeholder="Animal type (cow, goat, dog...)">
+            <input id="animalAge" placeholder="Animal age">
+            <input id="farmerArea" placeholder="Village / Area">
+            <button onclick="saveProfile()">Save Animal Profile</button>
+            <p id="profileInfo"></p>
+        </div>
+
+        <div class="card">
+            <h3>Doctor Subscription</h3>
+            <select id="doctorType">
+                <option value="government">Government Veterinary Hospital - Free</option>
+                <option value="private">Private Doctor - ₹200 demo fee</option>
+            </select>
+            <select id="paymentMethod">
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="EasyPaisa">EasyPaisa</option>
+            </select>
+            <button onclick="subscribe()">Subscribe</button>
+            <p id="subscriptionInfo"></p>
+            <small>Payments are simulated for this lab project.</small>
+        </div>
+
+        <div class="card">
+            <h3>Post Animal Complaint / Consultation Request</h3>
+            <input id="symptomAnimal" placeholder="Animal name or type">
+            <select id="symptomType">
+                <option>Loss of appetite</option>
+                <option>Fever</option>
+                <option>Coughing</option>
+                <option>Skin problem</option>
+                <option>Injury</option>
+                <option>Other symptoms</option>
+            </select>
+            <textarea id="symptoms" placeholder="Describe signs and symptoms"></textarea>
+            <label>Upload image, audio or video:</label>
+            <input id="evidence" type="file" accept="image/*,audio/*,video/*">
+            <button onclick="postComplaint()">Submit Request</button>
+        </div>
+
+        <div class="card">
+            <h3>My Complaint Status and Doctor's Solution</h3>
+            <div id="myComplaints"></div>
+        </div>
+
+        <div class="card">
+            <h3>View Doctors</h3>
+            <div id="doctorDetails"></div>
+        </div>
+
+        <div class="card">
+            <h3>Vetcure Information and Animal Care News</h3>
+            <div id="newsList"></div>
+        </div>
+
+        <div class="card">
+            <h3>Disease Report by Area</h3>
+            <button onclick="showReport()">View Report</button>
+            <div id="report"></div>
+        </div>
+
+        <div class="card">
+            <h3>Feedback</h3>
+            <textarea id="feedbackText" placeholder="Write your feedback"></textarea>
+            <button onclick="postFeedback()">Submit Feedback</button>
+        </div>
+    </div>
+
+    <!-- DOCTOR DASHBOARD -->
+    <div id="doctorPanel" class="hidden">
+
+        <div class="card">
+            <h3>Doctor Profile and Payment Details</h3>
+            <input id="doctorName" placeholder="Doctor name">
+            <input id="qualification" placeholder="Qualification">
+            <input id="clinic" placeholder="Clinic / Government Hospital">
+            <select id="clinicType">
+                <option value="government">Government</option>
+                <option value="private">Private</option>
+            </select>
+            <input id="bankDetails" placeholder="Demo bank details">
+            <input id="easyPaisa" placeholder="EasyPaisa account details">
+            <button onclick="saveDoctorProfile()">Save Doctor Profile</button>
+            <p id="doctorProfileInfo"></p>
+        </div>
+
+        <div class="card">
+            <h3>View and Respond to Complaints</h3>
+            <div id="doctorComplaints"></div>
+        </div>
+
+        <div class="card">
+            <h3>Manage Animal Cures</h3>
+            <input id="cureDisease" placeholder="Disease / condition name">
+            <textarea id="cureDetails" placeholder="General care information"></textarea>
+            <textarea id="curePrescription" placeholder="Treatment or prescription information"></textarea>
+            <button onclick="addCure()">Add Cure Information</button>
+            <div id="cureList"></div>
+        </div>
+
+        <div class="card">
+            <h3>Manage News</h3>
+            <input id="newsTitle" placeholder="News title">
+            <textarea id="newsContent" placeholder="News content"></textarea>
+            <button onclick="addNews()">Publish News</button>
+        </div>
+
+        <div class="card">
+            <h3>View User and Payment Details</h3>
+            <div id="userDetails"></div>
+            <div id="paymentDetails"></div>
+        </div>
+
+        <div class="card">
+            <h3>Feedback Details</h3>
+            <div id="feedbackList"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+let users = [
+    { username: "farmer", password: "farm123", role: "farmer" },
+    { username: "doctor", password: "doc123", role: "doctor" }
+];
+
+let currentUser = null;
+let profiles = {};
+let subscriptions = [];
+let complaints = [];
+let cures = [];
+let news = [
+    {
+        title: "Animal Health",
+        content: "Provide clean drinking water, proper food and regular veterinary checkups."
+    }
+];
+let feedbacks = [];
+let payments = [];
+let nextComplaintId = 1;
+
+function register() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
+
+    if (!username || !password) {
+        alert("Enter username and password.");
+        return;
+    }
+
+    if (users.some(u => u.username === username)) {
+        alert("Username already exists.");
+        return;
+    }
+
+    users.push({ username, password, role });
+    alert("Registration successful. Please log in.");
+}
+
+function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
+
+    const user = users.find(u =>
+        u.username === username &&
+        u.password === password &&
+        u.role === role
+    );
+
+    if (!user) {
+        alert("Invalid login details.");
+        return;
+    }
+
+    currentUser = user;
+    document.getElementById("loginPanel").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("welcome").textContent =
+        "Welcome, " + user.username;
+
+    document.getElementById("farmerPanel").classList.add("hidden");
+    document.getElementById("doctorPanel").classList.add("hidden");
+
+    if (user.role === "farmer") {
+        document.getElementById("farmerPanel").classList.remove("hidden");
+        renderFarmer();
+    } else {
+        document.getElementById("doctorPanel").classList.remove("hidden");
+        renderDoctor();
+    }
+}
+
+function saveProfile() {
+    profiles[currentUser.username] = {
+        animalName: document.getElementById("animalName").value.trim(),
+        animalType: document.getElementById("animalType").value.trim(),
+        animalAge: document.getElementById("animalAge").value.trim(),
+        area: document.getElementById("farmerArea").value.trim()
+    };
+
+    document.getElementById("profileInfo").textContent =
+        "Animal profile saved successfully.";
+}
+
+function subscribe() {
+    const type = document.getElementById("doctorType").value;
+    const method = document.getElementById("paymentMethod").value;
+    const fee = type === "government" ? 0 : 200;
+
+    if (type === "private") {
+        const confirmed = confirm("Pay demo fee of ₹200 using " + method + "?");
+        if (!confirmed) return;
+    }
+
+    const existing = subscriptions.find(s => s.farmer === currentUser.username);
+
+    if (existing) {
+        existing.type = type;
+        existing.method = method;
+        existing.fee = fee;
+        existing.status = fee === 0 ? "Active - Free" : "Active - Demo Payment";
+    } else {
+        subscriptions.push({
+            farmer: currentUser.username,
+            type, method, fee,
+            status: fee === 0 ? "Active - Free" : "Active - Demo Payment"
+        });
+    }
+
+    if (fee > 0) {
+        payments.push({
+            farmer: currentUser.username,
+            amount: fee,
+            method,
+            status: "Demo payment"
+        });
+    }
+
+    document.getElementById("subscriptionInfo").textContent =
+        "Subscription: " + type + " | Fee: ₹" + fee +
+        " | Status: " + (fee === 0 ? "Active - Free" : "Active - Demo Payment");
+
+    renderDoctor();
+}
+
+function postComplaint() {
+    const animal = document.getElementById("symptomAnimal").value.trim();
+    const symptomType = document.getElementById("symptomType").value;
+    const symptoms = document.getElementById("symptoms").value.trim();
+    const file = document.getElementById("evidence").files[0];
+
+    if (!animal || !symptoms) {
+        alert("Enter the animal name/type and symptoms.");
+        return;
+    }
+
+    const subscription = subscriptions.find(s =>
+        s.farmer === currentUser.username
+    );
+
+    if (!subscription) {
+        alert("Please subscribe before submitting a consultation request.");
+        return;
+    }
+
+    function saveEvidence(fileName) {
+        complaints.push({
+            id: nextComplaintId++,
+            farmer: currentUser.username,
+            animal,
+            symptomType,
+            symptoms,
+            fileName,
+            status: "Pending",
+            solution: "Waiting for doctor response"
+        });
+
+        document.getElementById("symptomAnimal").value = "";
+        document.getElementById("symptoms").value = "";
+        document.getElementById("evidence").value = "";
+
+        renderFarmer();
+        renderDoctor();
+        alert("Consultation request submitted.");
+    }
+
+    saveEvidence(file ? file.name : "No attachment");
+}
+
+function saveDoctorProfile() {
+    profiles["doctor:" + currentUser.username] = {
+        name: document.getElementById("doctorName").value.trim(),
+        qualification: document.getElementById("qualification").value.trim(),
+        clinic: document.getElementById("clinic").value.trim(),
+        type: document.getElementById("clinicType").value,
+        bank: document.getElementById("bankDetails").value.trim(),
+        easyPaisa: document.getElementById("easyPaisa").value.trim()
+    };
+
+    document.getElementById("doctorProfileInfo").textContent =
+        "Doctor profile saved successfully.";
+    renderFarmer();
+}
+
+function respond(id) {
+    const c = complaints.find(c => c.id === id);
+    if (!c) return;
+
+    const solution = document.getElementById("solution" + id).value.trim();
+    const status = document.getElementById("status" + id).value;
+
+    if (!solution) {
+        alert("Enter a response for the farmer.");
+        return;
+    }
+
+    c.solution = solution;
+    c.status = status;
+
+    renderDoctor();
+    renderFarmer();
+    alert("Response submitted.");
+}
+
+function addCure() {
+    const disease = document.getElementById("cureDisease").value.trim();
+    const details = document.getElementById("cureDetails").value.trim();
+    const prescription = document.getElementById("curePrescription").value.trim();
+
+    if (!disease || !details) {
+        alert("Enter the condition and care information.");
+        return;
+    }
+
+    cures.push({ disease, details, prescription });
+    document.getElementById("cureDisease").value = "";
+    document.getElementById("cureDetails").value = "";
+    document.getElementById("curePrescription").value = "";
+    renderCures();
+}
+
+function addNews() {
+    const title = document.getElementById("newsTitle").value.trim();
+    const content = document.getElementById("newsContent").value.trim();
+
+    if (!title || !content) {
+        alert("Enter the news title and content.");
+        return;
+    }
+
+    news.push({ title, content });
+    document.getElementById("newsTitle").value = "";
+    document.getElementById("newsContent").value = "";
+    renderNews();
+    alert("News published.");
+}
+
+function postFeedback() {
+    const message = document.getElementById("feedbackText").value.trim();
+
+    if (!message) {
+        alert("Enter your feedback.");
+        return;
+    }
+
+    feedbacks.push({
+        farmer: currentUser.username,
+        message
+    });
+
+    document.getElementById("feedbackText").value = "";
+    alert("Feedback submitted.");
+    renderDoctor();
+}
+
+function showReport() {
+    const areaCounts = {};
+
+    complaints.forEach(c => {
+        const profile = profiles[c.farmer];
+        const area = profile && profile.area ? profile.area : "Area not provided";
+        const key = area + " — " + c.symptomType;
+        areaCounts[key] = (areaCounts[key] || 0) + 1;
+    });
+
+    const report = document.getElementById("report");
+    const entries = Object.entries(areaCounts);
+
+    report.innerHTML = entries.length ? entries.map(([key, count]) =>
+        `<div class="item">${escapeHTML(key)}: ${count} report(s)</div>`
+    ).join("") : "No complaint data available yet.";
+}
+
+function renderFarmer() {
+    const profile = profiles[currentUser.username];
+
+    if (profile) {
+        document.getElementById("animalName").value = profile.animalName || "";
+        document.getElementById("animalType").value = profile.animalType || "";
+        document.getElementById("animalAge").value = profile.animalAge || "";
+        document.getElementById("farmerArea").value = profile.area || "";
+    }
+
+    const subscription = subscriptions.find(s => s.farmer === currentUser.username);
+    document.getElementById("subscriptionInfo").textContent = subscription ?
+        "Subscription: " + subscription.type + " | " + subscription.status :
+        "No active subscription.";
+
+    const mine = complaints.filter(c => c.farmer === currentUser.username);
+
+    document.getElementById("myComplaints").innerHTML =
+        mine.length ? mine.map(c => `
+            <div class="item">
+                <b>Request #${c.id}</b>
+                <p>Animal: ${escapeHTML(c.animal)}</p>
+                <p>Symptoms: ${escapeHTML(c.symptomType)} — ${escapeHTML(c.symptoms)}</p>
+                <p>Attachment: ${escapeHTML(c.fileName)}</p>
+                <p>Status: ${escapeHTML(c.status)}</p>
+                <p>Doctor response: ${escapeHTML(c.solution)}</p>
+            </div>
+        `).join("") : "No consultation requests submitted.";
+
+    renderDoctors();
+    renderNews();
+}
+
+function renderDoctor() {
+    const mine = complaints;
+
+    document.getElementById("doctorComplaints").innerHTML =
+        mine.length ? mine.map(c => `
+            <div class="item">
+                <b>Request #${c.id}</b>
+                <p>Farmer: ${escapeHTML(c.farmer)}</p>
+                <p>Animal: ${escapeHTML(c.animal)}</p>
+                <p>Symptoms: ${escapeHTML(c.symptomType)} — ${escapeHTML(c.symptoms)}</p>
+                <p>Attachment name: ${escapeHTML(c.fileName)}</p>
+                <p>Current status: ${escapeHTML(c.status)}</p>
+                <textarea id="solution${c.id}" placeholder="Enter response / advice">${escapeHTML(c.solution === "Waiting for doctor response" ? "" : c.solution)}</textarea>
+                <select id="status${c.id}">
+                    <option ${c.status === "Pending" ? "selected" : ""}>Pending</option>
+                    <option ${c.status === "In Progress" ? "selected" : ""}>In Progress</option>
+                    <option ${c.status === "Answered" ? "selected" : ""}>Answered</option>
+                </select>
+                <button onclick="respond(${c.id})">Post Solution</button>
+            </div>
+        `).join("") : "No consultation requests available.";
+
+    const farmerUsers = users.filter(u => u.role === "farmer");
+
+    document.getElementById("userDetails").innerHTML =
+        "<h4>Registered Farmers</h4>" +
+        (farmerUsers.length ? farmerUsers.map(u =>
+            `<div class="item">${escapeHTML(u.username)}</div>`
+        ).join("") : "No farmers registered.");
+
+    document.getElementById("paymentDetails").innerHTML =
+        "<h4>Payment Details</h4>" +
+        (payments.length ? payments.map(p =>
+            `<div class="item">Farmer: ${escapeHTML(p.farmer)} | Amount: ₹${p.amount} | Method: ${escapeHTML(p.method)} | ${escapeHTML(p.status)}</div>`
+        ).join("") : "No payments recorded.");
+
+    document.getElementById("feedbackList").innerHTML =
+        feedbacks.length ? feedbacks.map(f =>
+            `<div class="item">${escapeHTML(f.farmer)}: ${escapeHTML(f.message)}</div>`
+        ).join("") : "No feedback submitted.";
+
+    renderCures();
+}
+
+function renderDoctors() {
+    const doctors = users.filter(u => u.role === "doctor");
+
+    document.getElementById("doctorDetails").innerHTML =
+        doctors.map(d => {
+            const p = profiles["doctor:" + d.username];
+            return `<div class="item">
+                <b>${escapeHTML(p && p.name ? p.name : d.username)}</b><br>
+                ${escapeHTML(p && p.qualification ? p.qualification : "Qualification not added")}<br>
+                ${escapeHTML(p && p.clinic ? p.clinic : "Clinic not added")}<br>
+                Type: ${escapeHTML(p && p.type ? p.type : "Not specified")}
+            </div>`;
+        }).join("");
+}
+
+function renderNews() {
+    document.getElementById("newsList").innerHTML = news.map(n =>
+        `<div class="item"><b>${escapeHTML(n.title)}</b><p>${escapeHTML(n.content)}</p></div>`
+    ).join("");
+}
+
+function renderCures() {
+    document.getElementById("cureList").innerHTML =
+        cures.length ? cures.map(c =>
+            `<div class="item"><b>${escapeHTML(c.disease)}</b>
+            <p>${escapeHTML(c.details)}</p>
+            <p>${escapeHTML(c.prescription)}</p></div>`
+        ).join("") : "No cure information added.";
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[ch]);
+}
+
+function logout() {
+    currentUser = null;
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("loginPanel").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
