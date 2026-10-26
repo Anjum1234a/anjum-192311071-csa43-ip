@@ -2,89 +2,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>ComplainEase - Complaint Management</title>
+<title>EasyToll - Online Toll Payment</title>
 <style>
-body{font-family:Arial;background:#f2f4f8;margin:0}
-header{background:#4338a8;color:white;text-align:center;padding:18px}
-.container{background:white;max-width:900px;margin:20px auto;padding:20px;border-radius:8px}
-input,textarea,select{display:block;width:95%;padding:10px;margin:8px 0;box-sizing:border-box}
-button{background:#4338a8;color:white;padding:10px;border:0;margin:5px;cursor:pointer}
-nav{text-align:center;background:#e3e0ff;padding:10px}
+body{font-family:Arial;background:#eef3f8;margin:0}
+header{background:#164e63;color:white;padding:18px;text-align:center}
+.container{background:white;max-width:850px;margin:20px auto;padding:20px;border-radius:8px}
+input,select{padding:10px;margin:6px;width:90%;box-sizing:border-box}
+button{background:#087e8b;color:white;padding:10px;border:0;margin:5px;cursor:pointer}
+nav{text-align:center;background:#d9edf2;padding:10px}
+section{margin-top:15px}
 .hidden{display:none}
 table{width:100%;border-collapse:collapse;margin-top:12px}
-th,td{border:1px solid #ccc;padding:9px;text-align:left}
+td,th{border:1px solid #ccc;padding:9px}
 </style>
 </head>
 <body>
-<header><h1>ComplainEase</h1><p>Register. Track. Resolve.</p></header>
+<header><h1>EasyToll</h1><p>Pay in Advance. Travel Without Delay.</p></header>
 
 <div class="container" id="login">
 <h2>Login / Register</h2>
-<select id="role"><option>User</option><option>Officer</option><option>Admin</option></select>
+<select id="role">
+<option value="User">User</option>
+<option value="Admin">Admin</option>
+<option value="Gate">Toll Gate User</option>
+</select>
 <input id="username" placeholder="Username">
 <input id="password" type="password" placeholder="Password">
 <button onclick="login()">Login</button>
-<button onclick="register()">Register</button>
+<button onclick="register()">Register User</button>
 <p id="msg"></p>
-<small>Demo admin: admin / admin123<br>Demo officer: officer / off123</small>
+<small>Demo admin: admin / admin123<br>
+Demo gate user: gate / gate123</small>
 </div>
 
 <div id="app" class="hidden">
 <nav>
-<button onclick="show('complaint')">Post Complaint</button>
-<button onclick="show('status')">Complaint Status</button>
-<button onclick="show('officer')">Officer Panel</button>
-<button onclick="show('admin')">Admin Panel</button>
+<button onclick="show('wallet')">eWallet</button>
+<button onclick="show('passes')">Toll Pass</button>
+<button onclick="show('ticket')">eTicket</button>
+<button onclick="show('gate')">Toll Gate</button>
+<button onclick="show('admin')">Admin</button>
 <button onclick="logout()">Logout</button>
 </nav>
 
-<div class="container" id="complaint">
-<h2>Register a Complaint</h2>
-<input id="subject" placeholder="Complaint title">
-<select id="category">
-<option>Road</option><option>Water</option><option>Electricity</option>
-<option>Sanitation</option><option>Other</option>
+<div class="container" id="wallet">
+<h2>eWallet</h2>
+<p>Balance: ₹<span id="balance">500</span></p>
+<input id="amount" type="number" min="1" placeholder="Enter amount">
+<button onclick="addMoney()">Add Money</button>
+<button onclick="buyTicket()">Buy Toll eTicket (₹100)</button>
+<p id="walletMsg"></p>
+</div>
+
+<div class="container hidden" id="passes">
+<h2>Toll Pass Application</h2>
+<input id="vehicle" placeholder="Vehicle number">
+<input id="location" placeholder="Toll gate / route">
+<select id="passType">
+<option>Daily Pass</option><option>Monthly Pass</option>
 </select>
-<textarea id="description" placeholder="Describe your complaint"></textarea>
-<input id="place" placeholder="Location / address">
-<input id="proof" type="file" accept="image/*,.pdf">
-<button onclick="postComplaint()">Submit Complaint</button>
-<p id="postMsg"></p>
-<p><b>Admin contact:</b> admin@complainease.example (demo)</p>
+<button onclick="applyPass()">Apply / Renew Pass</button>
+<p id="passMsg"></p>
+<h3>Your Toll Passes</h3>
+<ul id="passList"></ul>
 </div>
 
-<div class="container hidden" id="status">
-<h2>Complaint History and Status</h2>
-<table>
-<thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Feedback</th></tr></thead>
-<tbody id="complaintList"></tbody>
-</table>
+<div class="container hidden" id="ticket">
+<h2>My Toll eTickets</h2>
+<ul id="ticketList"></ul>
+<p>Demo QR / Pass ID: <span id="qr">Not generated</span></p>
 </div>
 
-<div class="container hidden" id="officer">
-<h2>Officer Panel</h2>
-<p>View complaints and update their status.</p>
-<div id="officerList"></div>
+<div class="container hidden" id="gate">
+<h2>Toll Gate Verification</h2>
+<input id="verifyId" placeholder="Enter pass ID or ticket ID">
+<button onclick="verify()">Verify Pass / Ticket</button>
+<p id="verifyMsg"></p>
+<input id="gateLocation" placeholder="Current toll gate location">
+<button onclick="updateLocation()">Update Toll Location</button>
+<p id="gateMsg"></p>
 </div>
 
 <div class="container hidden" id="admin">
-<h2>Administrator Panel</h2>
-<input id="officerName" placeholder="New officer username">
-<input id="officerPassword" placeholder="Temporary password">
-<button onclick="createOfficer()">Create Officer Account</button>
-<h3>All Complaints</h3>
-<div id="adminList"></div>
-<h3>Accounts</h3>
-<div id="accountList"></div>
+<h2>Admin Dashboard</h2>
+<p>Manage toll details and approve pass applications.</p>
+<input id="tollName" placeholder="Toll gate name">
+<input id="tollFee" type="number" min="1" placeholder="Toll fee">
+<button onclick="addToll()">Create Toll Details</button>
+<ul id="tollList"></ul>
+<h3>Pass Applications</h3>
+<ul id="adminPassList"></ul>
 </div>
 </div>
 
 <script>
-let users=[
-{username:"admin",password:"admin123",role:"Admin"},
-{username:"officer",password:"off123",role:"Officer"}
-];
-let current=null,complaints=[],nextId=1;
+let users=[{username:"admin",password:"admin123",role:"Admin"},
+{username:"gate",password:"gate123",role:"Gate"}];
+let current=null,balance=500,passes=[],tickets=[],tolls=[],nextId=1;
 
 function login(){
 let u=username.value,p=password.value,r=role.value;
@@ -94,62 +108,61 @@ current=found;document.getElementById("login").classList.add("hidden");
 app.classList.remove("hidden");render();
 }
 function register(){
-let u=username.value.trim(),p=password.value,r=role.value;
-if(r!=="User")return alert("Only user registration is open. Admin creates officer accounts.");
+let u=username.value.trim(),p=password.value;
 if(!u||!p)return alert("Enter username and password.");
 if(users.some(x=>x.username===u))return alert("Username already exists.");
-users.push({username:u,password:p,role:r});msg.textContent="Registered. Please login.";
+users.push({username:u,password:p,role:"User"});
+msg.textContent="Registration successful. Login now.";
 }
 function logout(){current=null;app.classList.add("hidden");document.getElementById("login").classList.remove("hidden")}
 function show(id){
-if(id==="officer"&&current.role!=="Officer")return alert("Officer access only.");
+["wallet","passes","ticket","gate","admin"].forEach(x=>document.getElementById(x).classList.add("hidden"));
 if(id==="admin"&&current.role!=="Admin")return alert("Admin access only.");
-if(["complaint","status"].includes(id)&&current.role!=="User")return alert("User access only.");
-["complaint","status","officer","admin"].forEach(x=>document.getElementById(x).classList.add("hidden"));
+if(id==="gate"&&current.role!=="Gate")return alert("Toll gate access only.");
+if(["wallet","passes","ticket"].includes(id)&&current.role!=="User")return alert("User access only.");
 document.getElementById(id).classList.remove("hidden");render();
 }
-function postComplaint(){
-let s=subject.value.trim(),d=description.value.trim(),l=place.value.trim();
-if(!s||!d||!l)return alert("Fill in title, description and location.");
-complaints.push({id:nextId++,user:current.username,title:s,category:category.value,description:d,place:l,status:"Submitted",feedback:"",proof:""});
-postMsg.textContent="Complaint submitted successfully.";
-subject.value="";description.value="";place.value="";proof.value="";
+function addMoney(){
+let a=Number(amount.value);if(!Number.isFinite(a)||a<=0)return alert("Enter a valid amount.");
+balance+=a;document.getElementById("balance").textContent=balance;
+walletMsg.textContent="Demo money added successfully.";
+}
+function buyTicket(){
+if(balance<100)return alert("Insufficient balance.");
+balance-=100;document.getElementById("balance").textContent=balance;
+tickets.push({id:"T"+nextId++,owner:current.username});
+walletMsg.textContent="Demo ticket purchased.";
 render();
 }
-function updateStatus(id,value){
-if(current.role!=="Officer"&&current.role!=="Admin")return;
-let c=complaints.find(x=>x.id===id);if(c)c.status=value;render();
+function applyPass(){
+let v=vehicle.value.trim(),l=location.value.trim();
+if(!v||!l)return alert("Enter vehicle number and route.");
+passes.push({id:"P"+nextId++,owner:current.username,vehicle:v,location:l,type:passType.value,status:"Pending"});
+passMsg.textContent="Pass application submitted for admin approval.";render();
 }
-function feedback(id){
-let c=complaints.find(x=>x.id===id&&x.user===current.username);
-if(!c)return;
-let f=prompt("Enter your feedback:");
-if(f!==null){c.feedback=f;render()}
+function verify(){
+let id=verifyId.value.trim();
+let item=passes.find(x=>x.id===id&&x.status==="Approved")||tickets.find(x=>x.id===id);
+verifyMsg.textContent=item?"Valid demo pass/ticket.":"Invalid or unapproved pass/ticket.";
 }
-function createOfficer(){
+function updateLocation(){gateMsg.textContent="Demo toll location: "+gateLocation.value}
+function addToll(){
 if(current.role!=="Admin")return;
-let u=officerName.value.trim(),p=officerPassword.value;
-if(!u||!p)return alert("Enter username and password.");
-if(users.some(x=>x.username===u))return alert("Username already exists.");
-users.push({username:u,password:p,role:"Officer"});
-officerName.value="";officerPassword.value="";render();
+let n=tollName.value.trim(),f=Number(tollFee.value);
+if(!n||!Number.isFinite(f)||f<=0)return alert("Enter valid toll details.");
+tolls.push({name:n,fee:f});render();
 }
-function deleteAccount(name){
-if(current.role!=="Admin"||name==="admin")return;
-users=users.filter(x=>x.username!==name);
-render();
-}
-function escapeHTML(s){
-return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function approvePass(id){
+if(current.role!=="Admin")return;
+let p=passes.find(x=>x.id===id);if(p)p.status="Approved";render();
 }
 function render(){
-let own=complaints.filter(c=>c.user===current.username);
-document.getElementById("complaintList").innerHTML=own.map(c=>
-`<tr><td>${c.id}</td><td>${escapeHTML(c.title)}</td><td>${c.status}</td><td>${escapeHTML(c.feedback)} <button onclick="feedback(${c.id})">Feedback</button></td></tr>`).join("");
-let list=complaints.map(c=>`<div><hr><b>#${c.id} ${escapeHTML(c.title)}</b><p>${escapeHTML(c.description)}</p><p>Location: ${escapeHTML(c.place)} | Status: ${c.status}</p><select id="st${c.id}"><option>Submitted</option><option>In Progress</option><option>Resolved</option><option>Rejected</option></select><button onclick="updateStatus(${c.id},document.getElementById('st${c.id}').value)">Update Status</button></div>`).join("");
-document.getElementById("officerList").innerHTML=list;
-document.getElementById("adminList").innerHTML=list;
-document.getElementById("accountList").innerHTML=users.map(u=>`<p>${escapeHTML(u.username)} (${u.role}) ${u.username!=="admin"?`<button onclick="deleteAccount('${escapeHTML(u.username)}')">Delete</button>`:""}</p>`).join("");
+document.getElementById("balance").textContent=balance;
+document.getElementById("passList").innerHTML=passes.filter(x=>x.owner===current.username).map(x=>`<li>${x.id} — ${x.vehicle} — ${x.type} — ${x.status}</li>`).join("");
+document.getElementById("ticketList").innerHTML=tickets.filter(x=>x.owner===current.username).map(x=>`<li>${x.id} — QR demo ID: ${x.id}</li>`).join("");
+document.getElementById("qr").textContent=tickets.length?tickets[tickets.length-1].id:"Not generated";
+document.getElementById("adminPassList").innerHTML=current.role==="Admin"?passes.map(x=>`<li>${x.id} — ${x.owner} — ${x.vehicle} — ${x.status} ${x.status==="Pending"?`<button onclick="approvePass('${x.id}')">Approve</button>`:""}</li>`).join(""):"";
+document.getElementById("tollList").innerHTML=tolls.map(x=>`<li>${x.name} — ₹${x.fee}</li>`).join("");
 }
 </script>
 </body>
