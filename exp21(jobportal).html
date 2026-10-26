@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Job Portal</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 30px;
+            background: #f2f2f2;
+        }
+        h1 { color: navy; }
+        .box {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        button {
+            padding: 8px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Online Job Portal</h1>
+
+<h2>Search Vacancies</h2>
+
+<input type="text" id="search" placeholder="Search job title">
+<select id="location">
+    <option value="">All Locations</option>
+    <option value="Chennai">Chennai</option>
+    <option value="Bangalore">Bangalore</option>
+    <option value="Hyderabad">Hyderabad</option>
+</select>
+
+<select id="category">
+    <option value="">All Categories</option>
+    <option value="IT">IT</option>
+    <option value="HR">HR</option>
+    <option value="Finance">Finance</option>
+</select>
+
+<button onclick="showJobs()">Search</button>
+
+<div id="jobs"></div>
+<p id="message"></p>
+
+<script>
+var vacancies = [
+    {
+        title: "Java Developer",
+        location: "Chennai",
+        category: "IT",
+        description: "Entry-level Java developer"
+    },
+    {
+        title: "HR Recruiter",
+        location: "Bangalore",
+        category: "HR",
+        description: "Recruit and interview candidates"
+    },
+    {
+        title: "Software Tester",
+        location: "Hyderabad",
+        category: "IT",
+        description: "Test software applications"
+    },
+    {
+        title: "Account Assistant",
+        location: "Chennai",
+        category: "Finance",
+        description: "Assist with financial records"
+    }
+];
+
+var savedJobs = [];
+var appliedJobs = [];
+
+function showJobs() {
+    var search = document.getElementById("search").value.toLowerCase();
+    var location = document.getElementById("location").value;
+    var category = document.getElementById("category").value;
+
+    var output = "";
+
+    for (var i = 0; i < vacancies.length; i++) {
+        var job = vacancies[i];
+
+        if (job.title.toLowerCase().includes(search) &&
+            (location == "" || job.location == location) &&
+            (category == "" || job.category == category)) {
+
+            output += "<div class='box'>";
+            output += "<h3>" + job.title + "</h3>";
+            output += "<p>Location: " + job.location + "</p>";
+            output += "<p>Category: " + job.category + "</p>";
+            output += "<p>" + job.description + "</p>";
+            output += "<button onclick='applyJob(" + i + ")'>Apply</button>";
+            output += "<button onclick='saveJob(" + i + ")'>Save Job</button>";
+            output += "</div>";
+        }
+    }
+
+    document.getElementById("jobs").innerHTML =
+        output || "No vacancies found.";
+}
+
+function applyJob(index) {
+    if (!appliedJobs.includes(index)) {
+        appliedJobs.push(index);
+        alert("Application submitted for " + vacancies[index].title);
+    } else {
+        alert("You have already applied for this job.");
+    }
+}
+
+function saveJob(index) {
+    if (!savedJobs.includes(index)) {
+        savedJobs.push(index);
+        alert("Job saved successfully!");
+    } else {
+        alert("Job already saved.");
+    }
+}
+
+showJobs();
+</script>
+
+</body>
+</html>
