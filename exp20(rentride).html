@@ -1,0 +1,445 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RentRide - Vehicle Rental System</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#202b3c}
+header{background:#123b63;color:white;padding:22px 7%;display:flex;
+justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+header h1{margin:0;color:#ffca55}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+button{border:0;padding:10px 15px;border-radius:6px;cursor:pointer;
+background:#1266a8;color:white;font-weight:bold}
+button:hover{opacity:.85}
+nav button{background:#245477}
+.container{max-width:1100px;margin:25px auto;padding:0 18px}
+.panel{background:white;padding:22px;border-radius:12px;
+box-shadow:0 3px 14px #0000000b;margin-bottom:20px}
+h2{color:#123b63;margin-top:0}
+input,select,textarea{width:100%;padding:11px;margin:6px 0 14px;
+border:1px solid #ccd5df;border-radius:6px;font-size:15px}
+label{font-weight:bold;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.vehicle{border:1px solid #e0e6ed;border-radius:10px;overflow:hidden}
+.vehicle img{width:100%;height:155px;object-fit:cover;background:#e9eef4}
+.vehicle-info{padding:15px}
+.vehicle-info h3{margin:0 0 8px}
+.price{font-weight:bold;color:#087c63;font-size:18px}
+.badge{display:inline-block;background:#fff0c2;padding:5px 9px;
+border-radius:5px;font-size:12px;margin:5px 0}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{text-align:left;border-bottom:1px solid #e4e8ef;padding:11px;font-size:14px}
+th{background:#edf3f9}
+.table-wrap{overflow-x:auto}
+.small{font-size:13px;color:#637083}
+.hidden{display:none!important}
+.danger{background:#c43d45}
+.success{background:#13845d}
+.secondary{background:#657487}
+footer{text-align:center;padding:20px;color:#667085}
+#message{padding:12px;background:#e5f7ed;color:#17663f;border-radius:6px;
+margin-bottom:15px;display:none}
+@media(max-width:600px){header{padding:18px}nav button{padding:8px}
+.panel{padding:15px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🚗 RentRide</h1>
+  <nav>
+    <button onclick="show('home')">Home</button>
+    <button onclick="show('login')">Login</button>
+    <button onclick="show('register')">Register</button>
+    <button onclick="logout()">Logout</button>
+  </nav>
+</header>
+
+<div class="container">
+<div id="message"></div>
+
+<section id="home" class="page">
+  <div class="panel">
+    <h2>Find Your Perfect Ride</h2>
+    <p>Search vehicles, choose your rental dates, and manage your bookings easily.</p>
+    <div class="row">
+      <div><label>Vehicle Type</label>
+        <select id="filterType" onchange="renderVehicles()">
+          <option value="">All types</option><option>Car</option>
+          <option>SUV</option><option>Truck</option><option>Bike</option>
+        </select>
+      </div>
+      <div><label>Location</label>
+        <input id="filterLocation" placeholder="Enter location" oninput="renderVehicles()">
+      </div>
+      <div><label>Maximum price per day (₹)</label>
+        <input id="filterPrice" type="number" min="0" placeholder="Any price" oninput="renderVehicles()">
+      </div>
+    </div>
+  </div>
+  <h2>Available Vehicles</h2>
+  <div id="vehicleList" class="grid"></div>
+</section>
+
+<section id="login" class="page hidden">
+  <div class="panel">
+    <h2>Login</h2>
+    <form onsubmit="login(event)">
+      <label>Email or Username</label><input id="loginName" required>
+      <label>Password</label><input id="loginPass" type="password" required>
+      <button>Login</button>
+    </form>
+    <p class="small">Demo admin: admin / admin123</p>
+    <p class="small">Demo user: user / user123</p>
+  </div>
+</section>
+
+<section id="register" class="page hidden">
+  <div class="panel">
+    <h2>Create User Account</h2>
+    <form onsubmit="register(event)">
+      <label>Full Name</label><input id="regName" required>
+      <label>Username</label><input id="regUser" required>
+      <label>Email</label><input id="regEmail" type="email" required>
+      <label>Phone Number</label><input id="regPhone" required>
+      <label>Address</label><textarea id="regAddress" required></textarea>
+      <label>Password</label><input id="regPass" type="password" minlength="4" required>
+      <button>Create Account</button>
+    </form>
+  </div>
+</section>
+
+<section id="admin" class="page hidden">
+  <div class="panel">
+    <h2>Admin Dashboard</h2>
+    <p>Manage vehicles and approve customer bookings.</p>
+    <h3>Add / Update Vehicle</h3>
+    <form onsubmit="saveVehicle(event)">
+      <input id="vehicleId" type="hidden">
+      <div class="row">
+        <div><label>Vehicle Name</label><input id="vName" required></div>
+        <div><label>Type</label>
+          <select id="vType"><option>Car</option><option>SUV</option>
+            <option>Truck</option><option>Bike</option></select>
+        </div>
+        <div><label>Price per day (₹)</label><input id="vPrice" type="number" min="1" required></div>
+        <div><label>Location</label><input id="vLocation" required></div>
+      </div>
+      <label>Image URL (optional)</label><input id="vImage" type="url" placeholder="https://example.com/car.jpg">
+      <label>Description</label><textarea id="vDescription" required></textarea>
+      <button id="saveVehicleBtn">Add Vehicle</button>
+      <button type="button" class="secondary" onclick="clearVehicleForm()">Clear</button>
+    </form>
+  </div>
+  <div class="panel">
+    <h2>Manage Vehicles</h2><div class="table-wrap" id="adminVehicles"></div>
+  </div>
+  <div class="panel">
+    <h2>Manage Bookings</h2><div class="table-wrap" id="adminBookings"></div>
+  </div>
+  <div class="panel">
+    <h2>My Profile</h2><div id="adminProfile"></div>
+  </div>
+</section>
+
+<section id="dashboard" class="page hidden">
+  <div class="panel">
+    <h2>My Dashboard</h2>
+    <p>View your reservations and rental history.</p>
+    <button onclick="show('home')">Search Vehicles</button>
+  </div>
+  <div class="panel">
+    <h2>My Bookings</h2><div class="table-wrap" id="userBookings"></div>
+  </div>
+  <div class="panel">
+    <h2>My Profile</h2><div id="userProfile"></div>
+  </div>
+  <div class="panel">
+    <h2>Submit a Review</h2>
+    <form onsubmit="addReview(event)">
+      <label>Vehicle</label><select id="reviewVehicle"></select>
+      <label>Rating</label><select id="rating">
+        <option value="5">5 - Excellent</option><option value="4">4 - Very Good</option>
+        <option value="3">3 - Good</option><option value="2">2 - Fair</option>
+        <option value="1">1 - Poor</option></select>
+      <label>Comment</label><textarea id="reviewComment" required></textarea>
+      <button>Submit Review</button>
+    </form>
+    <div id="reviewList"></div>
+  </div>
+</section>
+</div>
+
+<footer>RentRide Vehicle Rental Management System | Internet Programming Lab</footer>
+
+<script>
+const defaultImage = "https://placehold.co/600x350?text=RentRide+Vehicle";
+
+let users = [
+ {name:"Administrator",username:"admin",email:"admin@rentride.demo",
+  phone:"-",address:"RentRide Office",password:"admin123",role:"admin"},
+ {name:"Demo Customer",username:"user",email:"user@rentride.demo",
+  phone:"9876543210",address:"Chennai",password:"user123",role:"user"}
+];
+
+let vehicles = [
+ {id:1,name:"City Sedan",type:"Car",price:1800,location:"Chennai",
+  image:"https://placehold.co/600x350?text=City+Sedan",description:"Comfortable sedan for city and highway travel."},
+ {id:2,name:"Family SUV",type:"SUV",price:2800,location:"Chennai",
+  image:"https://placehold.co/600x350?text=Family+SUV",description:"Spacious SUV suitable for family trips."},
+ {id:3,name:"Delivery Truck",type:"Truck",price:3500,location:"Bengaluru",
+  image:"https://placehold.co/600x350?text=Delivery+Truck",description:"Useful truck for transporting goods."},
+ {id:4,name:"City Bike",type:"Bike",price:600,location:"Hyderabad",
+  image:"https://placehold.co/600x350?text=City+Bike",description:"Economical bike for short trips."}
+];
+
+let bookings = [];
+let reviews = [];
+let currentUser = null;
+let nextVehicleId = 5;
+let nextBookingId = 1;
+
+function showMessage(text) {
+  const box = document.getElementById("message");
+  box.textContent = text;
+  box.style.display = "block";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function show(id) {
+  if ((id==="admin" || id==="dashboard") && !currentUser) {
+    showMessage("Please log in first.");
+    id="login";
+  }
+  if (id==="admin" && currentUser?.role!=="admin") {
+    showMessage("Admin access required."); id="home";
+  }
+  if (id==="dashboard" && currentUser?.role!=="user") {
+    showMessage("Please log in as a user."); id="home";
+  }
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  document.getElementById("message").style.display="none";
+  if(id==="home") renderVehicles();
+  if(id==="admin") renderAdmin();
+  if(id==="dashboard") renderDashboard();
+}
+function login(e) {
+  e.preventDefault();
+  const name=document.getElementById("loginName").value.trim().toLowerCase();
+  const pass=document.getElementById("loginPass").value;
+  const found=users.find(u=>(u.username.toLowerCase()===name ||
+    u.email.toLowerCase()===name) && u.password===pass);
+  if(!found){showMessage("Invalid username/email or password.");return;}
+  currentUser=found;
+  showMessage("Welcome, "+found.name+"!");
+  show(found.role==="admin"?"admin":"dashboard");
+}
+function register(e) {
+  e.preventDefault();
+  const username=document.getElementById("regUser").value.trim();
+  const email=document.getElementById("regEmail").value.trim();
+  if(users.some(u=>u.username.toLowerCase()===username.toLowerCase() ||
+    u.email.toLowerCase()===email.toLowerCase())){
+    showMessage("Username or email already exists.");return;
+  }
+  const user={name:document.getElementById("regName").value.trim(),
+    username,email,phone:document.getElementById("regPhone").value.trim(),
+    address:document.getElementById("regAddress").value.trim(),
+    password:document.getElementById("regPass").value,role:"user"};
+  users.push(user);currentUser=user;
+  showMessage("Registration successful!");
+  show("dashboard");
+}
+function logout() {
+  currentUser=null;
+  showMessage("You have logged out.");
+  show("home");
+}
+function renderVehicles() {
+  const type=document.getElementById("filterType").value;
+  const location=document.getElementById("filterLocation").value.toLowerCase().trim();
+  const max=Number(document.getElementById("filterPrice").value)||Infinity;
+  const list=vehicles.filter(v=>(!type||v.type===type)&&
+    v.location.toLowerCase().includes(location)&&v.price<=max);
+  const target=document.getElementById("vehicleList");
+  if(!list.length){target.innerHTML="<p>No vehicles match your search.</p>";return;}
+  target.innerHTML=list.map(v=>`
+    <article class="vehicle">
+      <img src="${escapeAttr(v.image||defaultImage)}" alt="${escapeAttr(v.name)}"
+       onerror="this.src='${defaultImage}'">
+      <div class="vehicle-info">
+        <h3>${escapeHTML(v.name)}</h3>
+        <span class="badge">${escapeHTML(v.type)}</span>
+        <p>${escapeHTML(v.description)}</p>
+        <p>📍 ${escapeHTML(v.location)}</p>
+        <p class="price">₹${v.price.toLocaleString("en-IN")} / day</p>
+        <button onclick="bookVehicle(${v.id})">Book Now</button>
+      </div>
+    </article>`).join("");
+}
+function bookVehicle(id) {
+  if(!currentUser){showMessage("Please log in or register before booking.");show("login");return;}
+  if(currentUser.role!=="user"){showMessage("Please use a customer account to book.");return;}
+  const v=vehicles.find(x=>x.id===id);
+  if(!v)return;
+  document.getElementById("message").style.display="none";
+  const name=prompt("Customer name:",currentUser.name);
+  if(name===null)return;
+  const phone=prompt("Customer phone number:",currentUser.phone);
+  if(phone===null)return;
+  const address=prompt("Pickup / customer address:",currentUser.address);
+  if(address===null)return;
+  const start=prompt("Rental start date (YYYY-MM-DD):");
+  if(!start)return;
+  const end=prompt("Rental end date (YYYY-MM-DD):");
+  if(!end)return;
+  const startDate=new Date(start+"T00:00:00");
+  const endDate=new Date(end+"T00:00:00");
+  if(isNaN(startDate)||isNaN(endDate)||endDate<startDate){
+    showMessage("Enter valid rental dates. End date cannot be before start date.");return;
+  }
+  const days=Math.round((endDate-startDate)/86400000)+1;
+  if(days<1||days>365){showMessage("Rental duration must be between 1 and 365 days.");return;}
+  const overlap=bookings.some(b=>b.vehicleId===id&&
+    ["Pending","Approved","Checked In"].includes(b.status)&&
+    !(end<b.start||start>b.end));
+  if(overlap){showMessage("This vehicle is already booked for those dates.");return;}
+  bookings.push({id:nextBookingId++,vehicleId:id,vehicle:v.name,
+    username:currentUser.username,name,phone,address,start,end,days,
+    total:days*v.price,status:"Pending",created:new Date().toLocaleDateString()});
+  showMessage("Booking submitted! Waiting for admin approval.");
+  show("dashboard");
+}
+function saveVehicle(e) {
+  e.preventDefault();
+  if(currentUser?.role!=="admin"){showMessage("Admin access required.");return;}
+  const id=Number(document.getElementById("vehicleId").value);
+  const data={name:document.getElementById("vName").value.trim(),
+    type:document.getElementById("vType").value,
+    price:Number(document.getElementById("vPrice").value),
+    location:document.getElementById("vLocation").value.trim(),
+    image:document.getElementById("vImage").value.trim()||defaultImage,
+    description:document.getElementById("vDescription").value.trim()};
+  if(data.price<=0){showMessage("Price must be greater than zero.");return;}
+  if(id){vehicles=vehicles.map(v=>v.id===id?{...v,...data}:v);
+    showMessage("Vehicle details updated.");}
+  else{vehicles.push({id:nextVehicleId++,...data});showMessage("Vehicle added successfully.");}
+  clearVehicleForm();renderAdmin();renderVehicles();
+}
+function clearVehicleForm() {
+  document.getElementById("vehicleId").value="";
+  ["vName","vPrice","vLocation","vImage","vDescription"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("saveVehicleBtn").textContent="Add Vehicle";
+}
+function editVehicle(id) {
+  const v=vehicles.find(x=>x.id===id);if(!v)return;
+  document.getElementById("vehicleId").value=v.id;
+  document.getElementById("vName").value=v.name;
+  document.getElementById("vType").value=v.type;
+  document.getElementById("vPrice").value=v.price;
+  document.getElementById("vLocation").value=v.location;
+  document.getElementById("vImage").value=v.image===defaultImage?"":v.image;
+  document.getElementById("vDescription").value=v.description;
+  document.getElementById("saveVehicleBtn").textContent="Update Vehicle";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function deleteVehicle(id) {
+  if(bookings.some(b=>b.vehicleId===id&&["Pending","Approved","Checked In"].includes(b.status))){
+    showMessage("Cannot delete a vehicle with active bookings.");return;
+  }
+  if(confirm("Delete this vehicle?")){
+    vehicles=vehicles.filter(v=>v.id!==id);renderAdmin();renderVehicles();
+    showMessage("Vehicle deleted.");
+  }
+}
+function updateBooking(id,status) {
+  const b=bookings.find(x=>x.id===id);if(!b)return;
+  if(status==="Approved"){
+    const conflict=bookings.some(other=>other.id!==id&&other.vehicleId===b.vehicleId&&
+      ["Approved","Checked In"].includes(other.status)&&
+      !(b.end<other.start||b.start>other.end));
+    if(conflict){showMessage("Cannot approve: another booking overlaps these dates.");return;}
+  }
+  b.status=status;renderAdmin();renderDashboard();
+  showMessage("Booking #"+id+" status updated to "+status+".");
+}
+function renderAdmin() {
+  document.getElementById("adminVehicles").innerHTML=vehicles.length?`
+    <table><tr><th>Vehicle</th><th>Type</th><th>Price/day</th><th>Location</th><th>Actions</th></tr>
+    ${vehicles.map(v=>`<tr><td>${escapeHTML(v.name)}</td><td>${escapeHTML(v.type)}</td>
+    <td>₹${v.price}</td><td>${escapeHTML(v.location)}</td><td>
+    <button onclick="editVehicle(${v.id})">Edit</button>
+    <button class="danger" onclick="deleteVehicle(${v.id})">Delete</button></td></tr>`).join("")}</table>`
+    :"<p>No vehicles available.</p>";
+  document.getElementById("adminBookings").innerHTML=bookings.length?`
+    <table><tr><th>ID / User</th><th>Vehicle</th><th>Dates</th><th>Customer</th><th>Total</th><th>Status / Actions</th></tr>
+    ${bookings.map(b=>`<tr><td>#${b.id}<br>${escapeHTML(b.username)}</td>
+    <td>${escapeHTML(b.vehicle)}</td><td>${b.start} to ${b.end}<br>${b.days} day(s)</td>
+    <td>${escapeHTML(b.name)}<br>${escapeHTML(b.phone)}<br>${escapeHTML(b.address)}</td>
+    <td>₹${b.total.toLocaleString("en-IN")}</td><td>${escapeHTML(b.status)}<br>
+    <button class="success" onclick="updateBooking(${b.id},'Approved')">Approve</button>
+    <button class="danger" onclick="updateBooking(${b.id},'Rejected')">Reject</button>
+    <button class="secondary" onclick="updateBooking(${b.id},'Checked In')">Check-in</button>
+    <button class="secondary" onclick="updateBooking(${b.id},'Completed')">Complete</button></td></tr>`).join("")}</table>`
+    :"<p>No bookings yet.</p>";
+  document.getElementById("adminProfile").innerHTML=
+    `<p><b>Name:</b> Administrator</p><p><b>Role:</b> Admin</p><p><b>Username:</b> admin</p>`;
+}
+function renderDashboard() {
+  const mine=bookings.filter(b=>b.username===currentUser.username);
+  document.getElementById("userBookings").innerHTML=mine.length?`
+    <table><tr><th>Booking</th><th>Vehicle</th><th>Rental Dates</th><th>Total</th><th>Status</th><th>Action</th></tr>
+    ${mine.map(b=>`<tr><td>#${b.id}</td><td>${escapeHTML(b.vehicle)}</td>
+    <td>${b.start} to ${b.end}<br>${b.days} day(s)</td>
+    <td>₹${b.total.toLocaleString("en-IN")}</td><td>${escapeHTML(b.status)}</td><td>
+    ${["Pending","Approved"].includes(b.status)?`<button class="danger" onclick="cancelBooking(${b.id})">Cancel</button>`:"—"}
+    </td></tr>`).join("")}</table>`
+    :"<p>You have not made any bookings yet.</p>";
+  document.getElementById("userProfile").innerHTML=`
+    <p><b>Name:</b> ${escapeHTML(currentUser.name)}</p>
+    <p><b>Username:</b> ${escapeHTML(currentUser.username)}</p>
+    <p><b>Email:</b> ${escapeHTML(currentUser.email)}</p>
+    <p><b>Phone:</b> ${escapeHTML(currentUser.phone)}</p>
+    <p><b>Address:</b> ${escapeHTML(currentUser.address)}</p>
+    <button onclick="editProfile()">Edit Profile</button>`;
+  document.getElementById("reviewVehicle").innerHTML=vehicles.map(v=>
+    `<option value="${v.id}">${escapeHTML(v.name)}</option>`).join("");
+  document.getElementById("reviewList").innerHTML=reviews.filter(r=>r.username===currentUser.username)
+    .map(r=>`<p><b>${escapeHTML(r.vehicle)}</b> — ${r.rating}/5<br>${escapeHTML(r.comment)}</p>`).join("")
+    ||"<p class='small'>Your submitted reviews will appear here.</p>";
+}
+function cancelBooking(id) {
+  const b=bookings.find(x=>x.id===id&&x.username===currentUser.username);
+  if(!b||!["Pending","Approved"].includes(b.status))return;
+  if(confirm("Cancel this booking?")){b.status="Cancelled";renderDashboard();showMessage("Booking cancelled.");}
+}
+function editProfile() {
+  const name=prompt("Full name:",currentUser.name);if(name===null)return;
+  const phone=prompt("Phone number:",currentUser.phone);if(phone===null)return;
+  const address=prompt("Address:",currentUser.address);if(address===null)return;
+  currentUser.name=name.trim();currentUser.phone=phone.trim();currentUser.address=address.trim();
+  renderDashboard();showMessage("Profile updated.");
+}
+function addReview(e) {
+  e.preventDefault();
+  const v=vehicles.find(x=>x.id===Number(document.getElementById("reviewVehicle").value));
+  if(!v)return;
+  reviews.push({username:currentUser.username,vehicle:v.name,
+    rating:Number(document.getElementById("rating").value),
+    comment:document.getElementById("reviewComment").value.trim()});
+  document.getElementById("reviewComment").value="";
+  renderDashboard();showMessage("Thank you for your review!");
+}
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function escapeAttr(value){return escapeHTML(value);}
+
+renderVehicles();
+</script>
+</body>
+</html>
