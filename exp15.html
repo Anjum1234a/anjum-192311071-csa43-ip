@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EasyToll</title>
+    <link rel="stylesheet" href="exp15.css">
+</head>
+<body>
+
+    <h1>EasyToll - Online Toll Payment</h1>
+
+    <h2>User Registration</h2>
+    <input type="text" id="name" placeholder="Enter Name">
+    <input type="email" id="email" placeholder="Enter Email">
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="register()">Register</button>
+
+    <h2>User Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <h2>eWallet</h2>
+    <input type="number" id="money" placeholder="Enter Amount">
+    <button onclick="addMoney()">Add Money</button>
+
+    <h2>Toll Services</h2>
+    <button onclick="buyTicket()">Buy Toll eTicket</button>
+    <button onclick="applyPass()">Apply Toll Pass</button>
+    <button onclick="showQR()">Get QR Code</button>
+
+    <h2>Admin</h2>
+    <button onclick="adminLogin()">Admin Login</button>
+    <button onclick="createToll()">Create Toll Details</button>
+
+    <h2>Toll Gate User</h2>
+    <button onclick="scanQR()">Scan QR</button>
+    <button onclick="verifyPass()">Verify Toll Pass</button>
+
+    <h3 id="result"></h3>
+
+    <script src="exp15.js"></script>
+</body>
+</html>

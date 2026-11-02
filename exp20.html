@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RentRide</title>
+    <link rel="stylesheet" href="exp20.css">
+</head>
+<body>
+
+<div id="login">
+    <h1>RentRide Login</h1>
+    <input id="name" placeholder="Enter username">
+    <button onclick="login()">Login</button>
+    <button onclick="page('register')">Register</button>
+</div>
+
+<div id="register" hidden>
+    <h1>User Registration</h1>
+    <input placeholder="Name">
+    <input placeholder="Email">
+    <input placeholder="Password">
+    <button onclick="page('login')">Register</button>
+</div>
+
+<div id="home" hidden>
+    <h1>Welcome to RentRide</h1>
+    <button onclick="page('search')">Search Vehicle</button>
+    <button onclick="page('booking')">Book Vehicle</button>
+    <button onclick="page('status')">Booking Status</button>
+    <button onclick="page('history')">Past Bookings</button>
+    <button onclick="page('review')">Reviews</button>
+    <button onclick="page('profile')">My Profile</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<div id="search" hidden>
+    <h1>Search Vehicles</h1>
+    <select>
+        <option>Car</option>
+        <option>Truck</option>
+        <option>SUV</option>
+    </select>
+    <input placeholder="Enter Location">
+    <input type="date">
+    <button onclick="page('booking')">Search</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="booking" hidden>
+    <h1>Vehicle Booking</h1>
+    <input placeholder="Customer Name">
+    <input placeholder="Customer Number">
+    <input placeholder="Address">
+    <select>
+        <option>Car</option>
+        <option>Truck</option>
+        <option>SUV</option>
+    </select>
+    <input type="date">
+    <button onclick="page('status')">Submit Booking</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="status" hidden>
+    <h1>Booking Status</h1>
+    <p>Your booking is waiting for approval.</p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="history" hidden>
+    <h1>Past Bookings</h1>
+    <p>View your previous vehicle bookings.</p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="review" hidden>
+    <h1>Reviews</h1>
+    <textarea placeholder="Write your review"></textarea>
+    <button onclick="alert('Review submitted')">Submit</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="profile" hidden>
+    <h1>My Profile</h1>
+    <p>User details</p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="admin" hidden>
+    <h1>Admin Panel</h1>
+    <button onclick="page('vehicle')">Add Vehicle</button>
+    <button onclick="page('manage')">Manage Bookings</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="vehicle" hidden>
+    <h1>Add Vehicle</h1>
+    <input placeholder="Vehicle Name">
+    <input placeholder="Vehicle Type">
+    <input placeholder="Price">
+    <button onclick="alert('Vehicle added')">Add</button>
+    <button onclick="page('admin')">Back</button>
+</div>
+
+<div id="manage" hidden>
+    <h1>Manage Bookings</h1>
+    <p>Approve or reject user bookings.</p>
+    <button onclick="alert('Booking approved')">Approve Booking</button>
+    <button onclick="page('admin')">Back</button>
+</div>
+
+<script src="exp20.js"></script>
+</body>
+</html>

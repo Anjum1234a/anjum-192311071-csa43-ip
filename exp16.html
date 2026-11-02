@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ComplainEase</title>
+    <link rel="stylesheet" href="exp16.css">
+</head>
+<body>
+
+    <h1>ComplainEase - Complaint Management System</h1>
+
+    <h2>User Registration</h2>
+    <input type="text" id="name" placeholder="Enter Name">
+    <input type="email" id="email" placeholder="Enter Email">
+    <button onclick="register()">Register</button>
+
+    <h2>User Login</h2>
+    <input type="email" placeholder="Enter Email">
+    <input type="password" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+
+    <h2>Post Complaint</h2>
+    <input type="text" id="complaint" placeholder="Enter Complaint">
+    <input type="file" id="proof">
+    <button onclick="postComplaint()">Submit Complaint</button>
+
+    <h2>Other User Services</h2>
+    <button onclick="locationMap()">Mark Location</button>
+    <button onclick="viewStatus()">View Complaint Status</button>
+    <button onclick="feedback()">Give Feedback</button>
+    <button onclick="adminContact()">Admin Contact</button>
+
+    <h2>Officer Section</h2>
+    <button onclick="officerRegister()">Officer Register</button>
+    <button onclick="officerLogin()">Officer Login</button>
+    <button onclick="viewComplaint()">View Complaint</button>
+    <button onclick="updateStatus()">Update Status</button>
+    <button onclick="updateProof()">Update Proof</button>
+
+    <h2>Admin Section</h2>
+    <button onclick="generateID()">Generate Officer ID</button>
+    <button onclick="createAccount()">Create Account</button>
+    <button onclick="deleteAccount()">Delete Account</button>
+    <button onclick="viewAccounts()">View Accounts</button>
+    <button onclick="changePassword()">Change Password</button>
+    <button onclick="hideFeatures()">Hide Features</button>
+
+    <h3 id="result"></h3>
+
+    <script src="exp16.js"></script>
+
+</body>
+</html>

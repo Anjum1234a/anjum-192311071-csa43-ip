@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VoteOnline</title>
+    <link rel="stylesheet" href="exp17.css">
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="login">
+    <h1>VoteOnline</h1>
+    <h2>Login</h2>
+    <input type="text" id="voter" placeholder="Voter ID">
+    <input type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="msg"></p>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="admin" style="display:none">
+    <h1>Admin Dashboard</h1>
+    <button onclick="show('Create Candidate')">Create Candidate</button>
+    <button onclick="show('Election Data Allocated')">Allocate Election Data</button>
+    <button onclick="show('Ward Allocated')">Allocate Ward</button>
+    <button onclick="show('Voter List Created')">Create Voter List</button>
+    <button onclick="show('Voter List Imported')">Import Voter List</button>
+    <button onclick="show('Voter List Updated')">Update Voter List</button>
+    <button onclick="page('results')">Election Results</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<!-- USER PAGE -->
+<div id="user" style="display:none">
+    <h1>Voter Dashboard</h1>
+    <button onclick="show('OTP Verified Successfully')">Verify OTP</button>
+    <button onclick="show('OTP: 123456')">Get OTP</button>
+    <button onclick="page('vote')">Select Candidate</button>
+    <button onclick="page('results')">View Results</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<!-- VOTING PAGE -->
+<div id="vote" style="display:none">
+    <h1>Cast Your Vote</h1>
+    <select id="candidate">
+        <option>Candidate A</option>
+        <option>Candidate B</option>
+        <option>Candidate C</option>
+    </select>
+    <button onclick="submitVote()">Submit Vote</button>
+    <button onclick="page('user')">Back</button>
+    <p id="voteMsg"></p>
+</div>
+
+<!-- RESULTS PAGE -->
+<div id="results" style="display:none">
+    <h1>Election Results</h1>
+    <h3>Candidate A - 120 Votes</h3>
+    <h3>Candidate B - 100 Votes</h3>
+    <h3>Candidate C - 80 Votes</h3>
+    <button onclick="page('user')">Back</button>
+</div>
+
+<p id="result"></p>
+
+<script src="exp17.js"></script>
+</body>
+</html>

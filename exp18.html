@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AgriMart</title>
+    <link rel="stylesheet" href="exp18.css">
+</head>
+<body>
+
+<div id="login">
+    <h1>AgriMart 🌱</h1>
+    <input id="name" placeholder="Username">
+    <button onclick="login()">Login</button>
+    <button onclick="page('register')">Register</button>
+</div>
+
+<div id="register" hidden>
+    <h1>Register</h1>
+    <input placeholder="Name">
+    <button onclick="page('otp')">Register</button>
+</div>
+
+<div id="otp" hidden>
+    <h1>OTP Verification</h1>
+    <input placeholder="Enter OTP">
+    <button onclick="page('home')">Verify</button>
+</div>
+
+<div id="home" hidden>
+    <h1>AgriMart Dashboard</h1>
+    <button onclick="page('products')">Products</button>
+    <button onclick="page('wallet')">Wallet</button>
+    <button onclick="page('cart')">Cart</button>
+    <button onclick="page('farmer')">Farmer</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<div id="products" hidden>
+    <h1>Products</h1>
+    <p>Seeds - Rs.200</p>
+    <p>Fertilizer - Rs.500</p>
+    <button onclick="addCart()">Add to Cart</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="wallet" hidden>
+    <h1>My Wallet</h1>
+    <input id="money" type="number" placeholder="Amount">
+    <button onclick="addMoney()">Add Money</button>
+    <p id="balance"></p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="cart" hidden>
+    <h1>My Cart</h1>
+    <p id="item">Cart Empty</p>
+    <button onclick="page('orders')">Order Product</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="orders" hidden>
+    <h1>My Orders</h1>
+    <p>Order Placed Successfully!</p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="farmer" hidden>
+    <h1>Farmer Dashboard</h1>
+    <input id="product" placeholder="Product Name">
+    <button onclick="addProduct()">Add Product</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<script src="exp18.js"></script>
+</body>
+</html>

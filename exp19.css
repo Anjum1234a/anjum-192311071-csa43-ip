@@ -1,0 +1,37 @@
+body {
+    text-align: center;
+    font-family: Arial;
+    background: #e8f5e9;
+    padding: 20px;
+}
+
+div {
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+#login { background: lightblue; }
+#register { background: pink; }
+#home { background: lightgreen; }
+#complaint { background: peachpuff; }
+#status { background: lavender; }
+#doctor { background: lightyellow; }
+#news { background: lightcyan; }
+#report { background: plum; }
+#payment { background: #ffd6d6; }
+#profile { background: #d6eaff; }
+#feedback { background: #f5d6ff; }
+#doctorPanel { background: #d6ffe5; }
+
+input, textarea, select, button {
+    padding: 10px;
+    margin: 8px;
+}
+
+button {
+    background: darkgreen;
+    color: white;
+    border: none;
+    cursor: pointer;
+}

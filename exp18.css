@@ -1,0 +1,33 @@
+body {
+    text-align: center;
+    font-family: Arial;
+    padding: 30px;
+    background: lightyellow;
+}
+
+div {
+    padding: 20px;
+    border-radius: 10px;
+    background: lightgreen;
+}
+
+#login { background: lightblue; }
+#register { background: pink; }
+#otp { background: lavender; }
+#products { background: lightyellow; }
+#wallet { background: peachpuff; }
+#cart { background: lightcyan; }
+#orders { background: plum; }
+#farmer { background: lightgreen; }
+
+input, button {
+    padding: 10px;
+    margin: 8px;
+}
+
+button {
+    background: darkgreen;
+    color: white;
+    border: none;
+    cursor: pointer;
+}

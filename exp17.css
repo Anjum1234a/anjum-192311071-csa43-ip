@@ -1,0 +1,29 @@
+body {
+    text-align: center;
+    font-family: Arial;
+    padding: 30px;
+}
+
+#login { background: lightblue; padding: 30px; }
+#admin { background: pink; padding: 30px; }
+#user { background: lightgreen; padding: 30px; }
+#vote { background: lightyellow; padding: 30px; }
+#results { background: lavender; padding: 30px; }
+
+input, select {
+    padding: 10px;
+    margin: 10px;
+}
+
+button {
+    padding: 10px;
+    margin: 8px;
+    background: darkblue;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: green;
+}

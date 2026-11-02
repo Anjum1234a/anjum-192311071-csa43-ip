@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VetCure</title>
+    <link rel="stylesheet" href="exp19.css">
+</head>
+<body>
+
+<div id="login">
+    <h1>🐾 VetCure</h1>
+    <h2>Login</h2>
+    <input id="name" placeholder="Username">
+    <button onclick="login()">Login</button>
+    <button onclick="page('register')">Register</button>
+</div>
+
+<div id="register" hidden>
+    <h1>Farmer Registration</h1>
+    <input placeholder="Name">
+    <input placeholder="Email">
+    <button onclick="page('home')">Register</button>
+</div>
+
+<div id="home" hidden>
+    <h1>Farmer Dashboard</h1>
+    <button onclick="page('complaint')">Post Complaint</button>
+    <button onclick="page('status')">My Complaint Status</button>
+    <button onclick="page('doctor')">View Doctor</button>
+    <button onclick="page('news')">View News</button>
+    <button onclick="page('report')">View Report</button>
+    <button onclick="page('payment')">Make Payment</button>
+    <button onclick="page('profile')">My Profile</button>
+    <button onclick="page('feedback')">Feedback</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<div id="complaint" hidden>
+    <h1>Post Animal Complaint</h1>
+    <input placeholder="Animal Symptoms">
+    <input type="file" accept="image/*,video/*,audio/*">
+    <textarea placeholder="Describe the problem"></textarea>
+    <button onclick="msg('Complaint Submitted!')">Submit</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="status" hidden>
+    <h1>Complaint Status</h1>
+    <p>Pending / Under Review</p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="doctor" hidden>
+    <h1>Available Doctors</h1>
+    <p>Dr. Kumar - Government CVH (Free)</p>
+    <p>Dr. Ravi - Private Clinic (Paid)</p>
+    <button onclick="page('payment')">Subscribe</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="news" hidden>
+    <h1>Animal Health News</h1>
+    <p>Keep your animals vaccinated and healthy.</p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="report" hidden>
+    <h1>Disease Report</h1>
+    <p>Common diseases: Fever, Foot and Mouth Disease.</p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="payment" hidden>
+    <h1>Payment</h1>
+    <select>
+        <option>Bank Transfer</option>
+        <option>EasyPaisa</option>
+    </select>
+    <button onclick="msg('Payment Successful!')">Pay Now</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="profile" hidden>
+    <h1>My Profile</h1>
+    <p>Farmer Details</p>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="feedback" hidden>
+    <h1>Feedback</h1>
+    <textarea placeholder="Enter Feedback"></textarea>
+    <button onclick="msg('Feedback Submitted!')">Submit</button>
+    <button onclick="page('home')">Back</button>
+</div>
+
+<div id="doctorPanel" hidden>
+    <h1>Doctor Dashboard</h1>
+    <button onclick="msg('Complaints Displayed')">View Complaint</button>
+    <button onclick="msg('Solution Posted')">Post Solution</button>
+    <button onclick="msg('Cure Updated')">Manage Cure</button>
+    <button onclick="msg('News Updated')">Manage News</button>
+    <button onclick="msg('User Details Displayed')">User Details</button>
+    <button onclick="msg('Payment Details Displayed')">Payment Details</button>
+    <button onclick="msg('Feedback Displayed')">Feedback Details</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<p id="result"></p>
+
+<script src="exp19.js"></script>
+</body>
+</html>
